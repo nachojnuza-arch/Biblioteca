@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "tertiary-fixed-dim": "#ffb4a6", "on-secondary-fixed-variant": "#3c4a3d", "outline-variant": "#dbc1bb", "background": "#fff8f5", "on-tertiary-container": "#ffd3cb", "primary-fixed-dim": "#ffb4a4", "surface-dim": "#e1d8d4", "surface-container-highest": "#e9e1dc", "primary-fixed": "#ffdad3", "primary": "#7f301f", "surface-bright": "#fff8f5", "secondary-fixed-dim": "#bbcbb9", "on-primary-container": "#ffd4ca", "surface-container": "#f5ece7", "tertiary": "#7e3124", "outline": "#88726d", "surface-container-high": "#efe6e1", "on-secondary-container": "#586658", "inverse-surface": "#34302c", "surface-container-lowest": "#ffffff", "inverse-on-surface": "#f8efea", "tertiary-container": "#9c4839", "on-error-container": "#93000a", "on-surface-variant": "#55423e", "on-secondary-fixed": "#111e14", "on-secondary": "#ffffff", "on-error": "#ffffff", "secondary": "#546254", "primary-container": "#9e4734", "inverse-primary": "#ffb4a4", "on-primary-fixed": "#3e0500", "on-primary-fixed-variant": "#7b2d1d", "error-container": "#ffdad6", "on-tertiary": "#ffffff", "on-tertiary-fixed": "#3f0400", "surface-tint": "#9a4431", "secondary-container": "#d4e4d2", "error": "#ba1a1a", "tertiary-fixed": "#ffdad4", "on-background": "#1e1b18", "on-tertiary-fixed-variant": "#7a2e21", "on-surface": "#1e1b18", "secondary-fixed": "#d7e7d5", "surface": "#fff8f5", "on-primary": "#ffffff", "surface-container-low": "#fbf2ed", "surface-variant": "#e9e1dc" }, borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, spacing: { "gutter": "1.5rem", "margin": "3rem", "gutter-mobile": "1rem", "space-lg": "1.5rem", "space-xs": "0.25rem", "space-md": "1rem", "margin-mobile": "1.25rem", "space-sm": "0.5rem", "space-xl": "2.5rem" }, fontFamily: { "reading-lg": ["EB Garamond"], "body-sm": ["Plus Jakarta Sans"], "headline-sm": ["EB Garamond"], "headline-lg-mobile": ["EB Garamond"], "label-sm": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "display-lg": ["EB Garamond"], "display-lg-mobile": ["EB Garamond"], "reading-base": ["EB Garamond"], "body-base": ["Plus Jakarta Sans"], "headline-lg": ["EB Garamond"], "headline-md": ["EB Garamond"] }, fontSize: { "reading-lg": ["21px", { "lineHeight": "34px", "fontWeight": "400" }], "body-sm": ["13px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "headline-lg-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "0em", "fontWeight": "500" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "500" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }], "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "display-lg-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "reading-base": ["18px", { "lineHeight": "30px", "fontWeight": "400" }], "body-base": ["15px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.005em", "fontWeight": "500" }], "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "500" }] } } } }</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+    /* 3D Realistic Page-Flip Styling */
+    .perspective-book {
+      perspective: 1600px;
+      perspective-origin: center center;
+    }
+    .preserve-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(-180deg);
+    }
+    /* Dynamic curl & paper depth */
+    .page-turn-fwd {
+      animation: realisticFlipForward 0.85s cubic-bezier(0.25, 0.9, 0.35, 1.0) forwards;
+      transform-origin: left center;
+    }
+    .page-turn-bwd {
+      animation: realisticFlipBackward 0.85s cubic-bezier(0.25, 0.9, 0.35, 1.0) forwards;
+      transform-origin: left center;
+    }
+    @keyframes realisticFlipForward {
+      0% {
+        transform: rotateY(0deg);
+        filter: drop-shadow(0 4px 12px rgba(43,39,36,0.1));
+      }
+      35% {
+        transform: rotateY(-65deg) skewY(-2deg) scale(0.985);
+        filter: drop-shadow(-18px 16px 28px rgba(43,39,36,0.22));
+      }
+      65% {
+        transform: rotateY(-125deg) skewY(1.5deg) scale(0.985);
+        filter: drop-shadow(-12px 14px 20px rgba(43,39,36,0.18));
+      }
+      100% {
+        transform: rotateY(-180deg);
+        filter: drop-shadow(0 4px 12px rgba(43,39,36,0.06));
+      }
+    }
+    @keyframes realisticFlipBackward {
+      0% {
+        transform: rotateY(-180deg);
+        filter: drop-shadow(0 4px 12px rgba(43,39,36,0.06));
+      }
+      35% {
+        transform: rotateY(-125deg) skewY(1.5deg) scale(0.985);
+        filter: drop-shadow(-12px 14px 20px rgba(43,39,36,0.18));
+      }
+      65% {
+        transform: rotateY(-65deg) skewY(-2deg) scale(0.985);
+        filter: drop-shadow(-18px 16px 28px rgba(43,39,36,0.22));
+      }
+      100% {
+        transform: rotateY(0deg);
+        filter: drop-shadow(0 4px 12px rgba(43,39,36,0.1));
+      }
+    }
+    /* Page curl corner peek effect */
+    .corner-hover:hover ~ .curl-preview,
+    .curl-preview:hover {
+      transform: scale(1.15) translate(-2px, -2px);
+    }
+  </style>
+</head><body class="bg-surface font-body-base text-body-base text-on-surface flex flex-col antialiased"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="h-16 px-gutter-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="Athenaeum Monogram Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbiEQF5QAe_dM9Uh4Zml9AVuVyCEvJ8eOhAgLXwj8-tLvBw5-sZkltYDecXB7_xqSU1VoZIH9rAywX_YHgy7Onbi1E_I2OTbPnMyrvZtyL5_t7R6dgXrtpPMSlp3XCp_2Q2hIrMjDYtpX1XcC-O5WgzLZge4h2q2IBx8iIVMvuSZcmd81HGe0A5h8UjYd0xSph_be3mMqQhxj-hTQ9dqI1zAhE0zc-XOaRuDpr-Ao"/><div class="flex flex-col"><span class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-widest">Athenaeum</span><span class="font-headline-sm text-headline-sm text-on-surface leading-none">Reader</span></div></div><div class="flex items-center gap-space-sm"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-20 bg-surface min-h-screen"><div class="flex flex-col w-full relative select-none">
+<!-- Dynamic Audio Atmosphere & Reading Ambience Bar -->
+<div class="w-full px-gutter-mobile pt-space-xs pb-space-sm flex items-center justify-between">
+<div class="flex items-center gap-space-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-primary font-semibold" id="bar-tome-tag">Tomo I</span>
+<span class="text-outline-variant font-reading-base">•</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate max-w-[170px]" id="bar-book-title">La Niebla en los Espejos</span>
+</div>
+<!-- Quick reader toolbar: Table of contents modal trigger & bookmark indicator -->
+<div class="flex items-center gap-space-xs">
+<button aria-label="Índice de capítulos" class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-container-high transition-colors shadow-sm" id="btn-toc">
+<span class="material-symbols-outlined text-[19px]">format_list_bulleted</span>
+</button>
+<button aria-label="Guardar marcapáginas" class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-surface-container-high transition-colors shadow-sm" id="btn-bookmark">
+<span class="material-symbols-outlined text-[19px]" id="bookmark-icon" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+</button>
+</div>
+</div>
+<!-- Main Realistic 3D Leaf Book Simulation Area -->
+<div class="w-full px-margin-mobile pb-space-sm perspective-book">
+<!-- Book Spine & 3D Stage Wrapper -->
+<div class="relative w-full min-h-[580px] rounded-lg shadow-[0_4px_24px_rgba(43,39,36,0.08),0_1px_4px_rgba(43,39,36,0.04)] preserve-3d" id="book-stage">
+<!-- Base Static Underlay Page (Underlying Page: Page 43) -->
+<div class="absolute inset-0 w-full h-full rounded-lg bg-[#FAF6EE] text-[#2B2724] overflow-hidden transition-colors duration-300 pointer-events-none" id="underlay-leaf">
+<!-- Spine gradient & paper grain -->
+<div class="absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-black/15 via-black/5 to-transparent pointer-events-none z-10"></div>
+<div class="absolute inset-y-0 left-0 w-1 bg-black/20 pointer-events-none z-10"></div>
+<div class="absolute inset-0 bg-[radial-gradient(#88726d_0.6px,transparent_0.6px)] [background-size:16px_16px] opacity-15 pointer-events-none"></div>
+<!-- Page 43 Content underlay -->
+<div class="relative z-0 px-6 pt-7 pb-12 flex flex-col h-full justify-between">
+<div>
+<header class="flex flex-col items-center text-center mb-5">
+<span class="font-label-sm text-label-sm uppercase tracking-[0.25em] text-[#88726D] mb-1.5">Capítulo IV (Cont.)</span>
+<h2 class="font-headline-md text-headline-md text-[#1E1B18] tracking-tight">El Resplandor del Navío</h2>
+<div class="flex items-center gap-2 mt-2 mb-1 text-primary/40">
+<span class="w-8 h-[1px] bg-primary/20"></span>
+<span class="material-symbols-outlined text-[14px]">history_edu</span>
+<span class="w-8 h-[1px] bg-primary/20"></span>
+</div>
+</header>
+<article class="font-reading-lg text-reading-lg text-[#26221F] space-y-4 text-justify leading-relaxed" id="underlay-content">
+<p>
+              El espejo conservaba la silueta de los tres palos mayores recortados contra el incendio del horizonte. Don Ernesto dio un paso más hacia el cristal, comprobando con asombro que la niebla parecía condensarse por dentro, humedeciendo la plata con pequeñas gotas de un rocío salobre.
+            </p>
+<div class="my-3 py-2 px-3 rounded-lg bg-[#F3ECE0] shadow-sm flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-[17px] mt-0.5" style="font-variation-settings: 'FILL' 1;">history</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-semibold">Bitácora de San Telmo (1889)</span>
+<p class="font-reading-base text-reading-base italic text-[#4A3F35] leading-snug">
+                  «Se oyó la campana del faro tocar sola siete campanadas durante la pleamar de medianoche.»
+                </p>
+</div>
+</div>
+<p>
+              No había viento en la habitación, sin embargo, las pesadas cortinas de terciopelo verde oscilaron apenas. Comprendió entonces que los recuerdos de la ciudad no descansaban en las bibliotecas, sino atrapados entre el mercurio y la madera vieja de aquella casa.
+            </p>
+</article>
+</div>
+<footer class="mt-4 pt-3 border-t border-[#88726D]/15 flex items-center justify-between font-label-md text-label-md text-[#88726D]">
+<span>Cap. IV</span>
+<div class="flex items-center gap-1.5 font-label-sm tracking-wider">
+<span class="text-primary font-semibold">43</span>
+<span>/</span>
+<span>180</span>
+</div>
+<span>San Telmo</span>
+</footer>
+</div>
+</div>
+<!-- The 3D Flipping Leaf Element (Transforms rotateY 0deg to -180deg) -->
+<div class="absolute inset-0 w-full h-full preserve-3d origin-left z-20 transition-transform" id="flipper-page" style="transform-origin: left center;">
+<!-- FRONT SIDE OF FLIPPING LEAF (Page 42) -->
+<div class="absolute inset-0 w-full h-full rounded-lg bg-[#FAF6EE] text-[#2B2724] shadow-[0_4px_24px_rgba(43,39,36,0.08),0_1px_4px_rgba(43,39,36,0.04)] overflow-hidden backface-hidden transition-colors duration-300" id="paper-leaf">
+<!-- Inner spine book crease gradient (left margin binding simulation) -->
+<div class="absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-black/10 via-black/3 to-transparent pointer-events-none z-10"></div>
+<div class="absolute inset-y-0 left-0 w-1 bg-black/15 pointer-events-none z-10"></div>
+<!-- Subtle Deckle / Archival Paper Grain Sheen -->
+<div class="absolute inset-0 bg-[radial-gradient(#88726d_0.6px,transparent_0.6px)] [background-size:16px_16px] opacity-15 pointer-events-none"></div>
+<!-- Book Leaf Inner Padding Container -->
+<div class="relative z-0 px-6 pt-7 pb-12 flex flex-col h-full justify-between">
+<div>
+<!-- Chapter Header Typography -->
+<header class="flex flex-col items-center text-center mb-5">
+<span class="font-label-sm text-label-sm uppercase tracking-[0.25em] text-[#88726D] mb-1.5" id="page-chapter-label">Capítulo IV</span>
+<h2 class="font-headline-md text-headline-md text-[#1E1B18] tracking-tight" id="page-title">Sombras de Azur</h2>
+<!-- Classic Deckle Ornament Divider -->
+<div class="flex items-center gap-2 mt-2 mb-1 text-primary/40">
+<span class="w-8 h-[1px] bg-primary/20"></span>
+<span class="material-symbols-outlined text-[14px]">cruelty_free</span>
+<span class="w-8 h-[1px] bg-primary/20"></span>
+</div>
+</header>
+<!-- Dynamic Reading Body (Garamond) -->
+<article class="font-reading-lg text-reading-lg text-[#26221F] space-y-4 text-justify leading-relaxed transition-all duration-200" id="readable-content">
+<!-- First Paragraph with Classic Drop Cap -->
+<p class="relative">
+<span class="float-left font-headline-lg text-headline-lg leading-none pt-1 pr-3 text-primary font-serif font-bold uppercase select-none">H</span>
+                abía un murmullo de agua densa bajo las losas del claustro, como si el río subterráneo de San Telmo hubiese despertado de su sopor centenario. Don Ernesto acercó la vela al azogue manchado del tocador veneciano, advirtiendo que los reflejos tardaban un latido en responder a sus movimientos, como si la imagen habitara un huso horario ligeramente diferido.
+              </p>
+<!-- Marginalia Note Interstitial Tag -->
+<div class="my-3 py-2 px-3 rounded-lg bg-[#F3ECE0] shadow-sm flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-[17px] mt-0.5" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-semibold">Nota marginal del autor (1938)</span>
+<p class="font-reading-base text-reading-base italic text-[#4A3F35] leading-snug">
+                    «En la primera edición este espejo pertenecía a la familia de los Aldao; corregido según los planos del sótano de Balcarce.»
+                  </p>
+</div>
+</div>
+<p>
+                Al deslizar las yemas de sus dedos sobre la orla de plata bruñida, un escalofrío de salitre le recorrió el antebrazo. Nadie en el puerto recordaba ya la noche en que la fragata <em class="font-reading-lg text-primary font-serif font-medium">Santa María del Socorro</em> zozobró frente a la restinga de piedras; pero el espejo retenía intacta la reverberación de sus bengalas moribundas.
+              </p>
+</article>
+</div>
+<!-- Paper Page Footer (Page Number & Chapter) -->
+<footer class="mt-4 pt-3 border-t border-[#88726D]/15 flex items-center justify-between font-label-md text-label-md text-[#88726D]">
+<span>Cap. IV</span>
+<div class="flex items-center gap-1.5 font-label-sm tracking-wider">
+<span class="text-primary font-semibold" id="page-num-display">42</span>
+<span>/</span>
+<span>180</span>
+</div>
+<span>San Telmo</span>
+</footer>
+</div>
+<!-- Interactive Curved Page Curl Effect (Bottom-Right Corner) -->
+<div aria-label="Voltear hoja adelante" class="absolute bottom-0 right-0 w-28 h-28 cursor-pointer group z-30" id="page-curl-trigger" role="button" title="Voltear página">
+<!-- Fold Triangle Shadow -->
+<div class="absolute bottom-0 right-0 w-16 h-16 bg-gradient-to-tl from-black/25 via-black/10 to-transparent pointer-events-none transition-all duration-300 group-hover:w-20 group-hover:h-20"></div>
+<!-- Curled Paper Face -->
+<div class="curl-preview absolute bottom-0 right-0 w-12 h-12 bg-gradient-to-br from-[#ECE5D8] via-[#E2D9C8] to-[#D5C9B3] rounded-tl-xl shadow-[-3px_-3px_10px_rgba(43,39,36,0.18)] transition-all duration-300 group-hover:w-16 group-hover:h-16 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary/80 text-[18px] transform rotate-45 ml-2 mt-2 transition-transform group-hover:scale-110">arrow_back</span>
+</div>
+</div>
+<!-- Reading Prompt Hint Overlay -->
+<div class="absolute bottom-3.5 left-6 z-10 flex items-center gap-1.5 text-[#88726D] pointer-events-none opacity-85">
+<span class="material-symbols-outlined text-[15px] animate-pulse text-primary">swipe_left</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-xs">Toca la esquina para voltear</span>
+</div>
+<!-- Dynamic Lighting/Shadow Overlay during 3D turning -->
+<div class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-300 bg-gradient-to-r from-black/20 via-black/5 to-transparent" id="flip-front-shadow"></div>
+</div>
+<!-- BACK SIDE OF FLIPPING LEAF (Verso - visible during & after rotation) -->
+<div class="absolute inset-0 w-full h-full rounded-lg bg-[#FAF6EE] text-[#2B2724] shadow-[-6px_4px_24px_rgba(43,39,36,0.12)] overflow-hidden backface-hidden [transform:rotateY(180deg)] transition-colors duration-300" id="verso-leaf">
+<!-- Reverse binding crease shadow (right side now) -->
+<div class="absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-black/10 via-black/3 to-transparent pointer-events-none z-10"></div>
+<div class="absolute inset-y-0 right-0 w-1 bg-black/15 pointer-events-none z-10"></div>
+<div class="absolute inset-0 bg-[radial-gradient(#88726d_0.6px,transparent_0.6px)] [background-size:16px_16px] opacity-15 pointer-events-none"></div>
+<div class="relative z-0 px-6 pt-7 pb-12 flex flex-col h-full justify-between">
+<div>
+<header class="flex flex-col items-center text-center mb-5">
+<span class="font-label-sm text-label-sm uppercase tracking-[0.25em] text-[#88726D] mb-1.5">Capítulo IV • Reverso</span>
+<h2 class="font-headline-md text-headline-md text-[#1E1B18] tracking-tight">Anotaciones de Bitácora</h2>
+<div class="flex items-center gap-2 mt-2 mb-1 text-primary/40">
+<span class="w-8 h-[1px] bg-primary/20"></span>
+<span class="material-symbols-outlined text-[14px]">auto_stories</span>
+<span class="w-8 h-[1px] bg-primary/20"></span>
+</div>
+</header>
+<article class="font-reading-lg text-reading-lg text-[#26221F] space-y-4 text-justify leading-relaxed">
+<p class="italic text-[#4A3F35]">
+                «...aquella noche la ciudad de Buenos Aires apagó los faroles de gas por orden de la Prefectura, dejando únicamente como faro el destello moribundo de las aguas del Plata.»
+              </p>
+<div class="p-3 bg-[#EFE7D8] rounded-lg text-body-sm font-body-sm text-[#55423e] border-l-2 border-primary">
+                Página complementaria de grabados y comentarios históricos. Puedes voltear de vuelta hacia la izquierda.
+              </div>
+</article>
+</div>
+<footer class="mt-4 pt-3 border-t border-[#88726D]/15 flex items-center justify-between font-label-md text-label-md text-[#88726D]">
+<span>Volver (Pág. 42)</span>
+<div class="flex items-center gap-1.5 font-label-sm tracking-wider">
+<span class="text-primary font-semibold">42-B</span>
+<span>/</span>
+<span>180</span>
+</div>
+<span>Reverso</span>
+</footer>
+</div>
+<!-- Interactive Corner on Verso to Flip Back -->
+<div aria-label="Voltear hoja atrás" class="absolute bottom-0 left-0 w-28 h-28 cursor-pointer group z-30" id="verso-curl-trigger" role="button" title="Volver página anterior">
+<div class="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-black/25 via-black/10 to-transparent pointer-events-none transition-all duration-300 group-hover:w-20 group-hover:h-20"></div>
+<div class="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-bl from-[#ECE5D8] via-[#E2D9C8] to-[#D5C9B3] rounded-tr-xl shadow-[3px_-3px_10px_rgba(43,39,36,0.18)] transition-all duration-300 group-hover:w-16 group-hover:h-16 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary/80 text-[18px] transform -rotate-45 mr-2 mt-2 transition-transform group-hover:scale-110">arrow_forward</span>
+</div>
+</div>
+<div class="absolute bottom-3.5 right-6 z-10 flex items-center gap-1.5 text-[#88726D] pointer-events-none opacity-85">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-xs">Toca para volver</span>
+<span class="material-symbols-outlined text-[15px] animate-pulse text-primary">swipe_right</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Touch Navigation & Fast Page Selector Control Strip -->
+<div class="w-full px-margin-mobile mb-space-xs flex items-center justify-between">
+<button class="flex items-center gap-1 text-xs uppercase tracking-wider font-label-sm text-on-surface-variant hover:text-primary transition-colors py-1 px-2.5 rounded-full bg-surface-container/70 active:scale-95" id="btn-prev-page">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+<span>Anterior</span>
+</button>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container text-primary font-label-sm text-xs font-semibold hover:bg-surface-container-high transition-all shadow-sm active:scale-95" id="btn-flip-toggle">
+<span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">flip</span>
+<span id="btn-flip-label">Voltear Hoja (3D)</span>
+</button>
+</div>
+<button class="flex items-center gap-1 text-xs uppercase tracking-wider font-label-sm text-on-surface-variant hover:text-primary transition-colors py-1 px-2.5 rounded-full bg-surface-container/70 active:scale-95" id="btn-next-page">
+<span>Siguiente</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+<!-- Page Progression Bar (Tome Progress) -->
+<div class="w-full px-margin-mobile mb-space-sm flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>
+<span>Progreso general</span>
+</span>
+<span class="font-semibold text-primary" id="progress-percent-label">23% completado</span>
+</div>
+<!-- Tactile Rail Progress Line -->
+<div class="w-full h-1.5 rounded-full bg-surface-container-high overflow-hidden relative shadow-inner cursor-pointer" id="progress-rail">
+<div class="h-full bg-primary rounded-full transition-all duration-300" id="progress-fill" style="width: 23%;"></div>
+</div>
+</div>
+<!-- Elegant Floating Dock Controls for Reader Settings -->
+<div class="w-full px-margin-mobile mb-space-md">
+<div class="w-full rounded-full bg-surface-container-lowest shadow-[0_8px_30px_rgba(43,39,36,0.06)] p-1.5 flex items-center justify-between">
+<!-- Font Size Controller (A / A+) -->
+<div class="flex items-center bg-surface-container rounded-full p-0.5">
+<button aria-label="Reducir tipografía" class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface hover:bg-surface transition-colors font-headline-sm text-sm" id="btn-font-dec">
+          A
+        </button>
+<span class="w-[1px] h-3.5 bg-outline-variant/30"></span>
+<button aria-label="Aumentar tipografía" class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface hover:bg-surface transition-colors font-headline-sm text-base font-bold" id="btn-font-inc">
+          A+
+        </button>
+</div>
+<!-- Paper Palette Quick Picker -->
+<div class="flex items-center gap-1.5 px-2">
+<button class="paper-swatch w-6 h-6 rounded-full bg-[#FAF6EE] shadow-sm ring-2 ring-primary transition-all" data-paper="ivory" title="Marfil cálido"></button>
+<button class="paper-swatch w-6 h-6 rounded-full bg-[#F4EBE1] shadow-sm hover:scale-105 transition-all" data-paper="cream" title="Pergamino antiguo"></button>
+<button class="paper-swatch w-6 h-6 rounded-full bg-[#FFFFFF] shadow-sm hover:scale-105 transition-all" data-paper="white" title="Blanco óptico"></button>
+<button class="paper-swatch w-6 h-6 rounded-full bg-[#23201D] shadow-sm hover:scale-105 transition-all" data-paper="night" title="Modo noche"></button>
+</div>
+<!-- Notes and Margin Drawer Action Button -->
+<button aria-label="Abrir notas y apuntes" class="flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary-container text-on-secondary-container hover:bg-secondary-fixed transition-colors shadow-sm" id="btn-marginalia">
+<span class="material-symbols-outlined text-[18px]">ink_pen</span>
+<span class="font-label-sm text-label-sm font-semibold">Notas (3)</span>
+</button>
+</div>
+</div>
+<!-- Retractable Marginalia / Chapter Drawer (Initially Hidden State Modal) -->
+<div class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex justify-end transition-opacity" id="drawer-marginalia">
+<div class="w-5/6 max-w-sm h-full bg-surface-container-lowest p-space-md shadow-2xl flex flex-col justify-between overflow-y-auto">
+<div class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined">menu_book</span>
+<h3 class="font-headline-sm text-headline-sm">Notas del Manuscrito</h3>
+</div>
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-container-high" id="btn-close-drawer">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Note Item 1 -->
+<div class="p-3 rounded-lg bg-surface-container-low shadow-sm flex flex-col gap-1">
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span class="font-semibold text-primary">Pág. 38 • Párrafo 2</span>
+<span>12 Oct</span>
+</div>
+<p class="font-reading-base text-reading-base italic text-on-surface leading-snug">
+            «El reflejo tardío no era una anomalía óptica sino temporal. Se inspiró en el cuento de Borges sobre los espejos aborrecibles.»
+          </p>
+</div>
+<!-- Note Item 2 -->
+<div class="p-3 rounded-lg bg-surface-container-low shadow-sm flex flex-col gap-1">
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span class="font-semibold text-secondary">Pág. 41 • Destacado</span>
+<span>14 Oct</span>
+</div>
+<p class="font-reading-base text-reading-base text-on-surface leading-snug">
+            «Cotejar con el archivo histórico de San Telmo el navío Santa María del Socorro para verificar fecha de naufragio.»
+          </p>
+</div>
+<!-- Note Item 3 -->
+<div class="p-3 rounded-lg bg-secondary-container/40 shadow-sm flex flex-col gap-1">
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span class="font-semibold text-tertiary">Pág. 42 • Margen activa</span>
+<span>Hoy</span>
+</div>
+<p class="font-reading-base text-reading-base italic text-on-surface leading-snug">
+            «Revisar el cambio de apellido Aldao / Balcarce en las galeradas de imprenta.»
+          </p>
+</div>
+</div>
+<!-- Drawer Quick Action -->
+<div class="pt-space-md flex flex-col gap-2">
+<button class="w-full py-2.5 rounded-lg bg-primary text-on-primary font-label-md text-label-md uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Añadir Anotación</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Page Turn Toast Feedback / Sound Simulation Visual -->
+<div class="pointer-events-none fixed bottom-24 left-1/2 transform -translate-x-1/2 opacity-0 transition-opacity duration-300 bg-inverse-surface/90 text-inverse-on-surface px-4 py-1.5 rounded-full flex items-center gap-2 shadow-lg z-50" id="page-turn-indicator">
+<span class="material-symbols-outlined text-[16px] text-primary-fixed-dim">auto_stories</span>
+<span class="font-label-sm text-label-sm" id="page-indicator-text">Página 43 cargada</span>
+</div>
+</div>
+<script>
+  (function() {
+    const flipper = document.getElementById('flipper-page');
+    const leaf = document.getElementById('paper-leaf');
+    const versoLeaf = document.getElementById('verso-leaf');
+    const underlay = document.getElementById('underlay-leaf');
+    const curl = document.getElementById('page-curl-trigger');
+    const versoCurl = document.getElementById('verso-curl-trigger');
+    const btnNext = document.getElementById('btn-next-page');
+    const btnPrev = document.getElementById('btn-prev-page');
+    const btnFlipToggle = document.getElementById('btn-flip-toggle');
+    const btnFlipLabel = document.getElementById('btn-flip-label');
+    const content = document.getElementById('readable-content');
+    const underlayContent = document.getElementById('underlay-content');
+    const btnFontInc = document.getElementById('btn-font-inc');
+    const btnFontDec = document.getElementById('btn-font-dec');
+    const btnBookmark = document.getElementById('btn-bookmark');
+    const bookmarkIcon = document.getElementById('bookmark-icon');
+    const btnMarginalia = document.getElementById('btn-marginalia');
+    const btnToc = document.getElementById('btn-toc');
+    const drawer = document.getElementById('drawer-marginalia');
+    const btnCloseDrawer = document.getElementById('btn-close-drawer');
+    const indicator = document.getElementById('page-turn-indicator');
+    const indicatorText = document.getElementById('page-indicator-text');
+    const progressFill = document.getElementById('progress-fill');
+    const progressLabel = document.getElementById('progress-percent-label');
+    const swatches = document.querySelectorAll('.paper-swatch');
+
+    let isFlipped = false;
+    let isAnimating = false;
+    let isBookmarked = true;
+    let currentFontSize = 21;
+
+    // Realistic Web Audio Synthesis for Page Rustle sound effect (zero external asset requirement)
+    function playPageSound() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        
+        // White noise buffer for paper friction
+        const bufferSize = ctx.sampleRate * 0.22;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.45));
+        }
+
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        // Bandpass filter to emulate parchment texture
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1100, ctx.currentTime);
+        filter.Q.setValueAtTime(1.8, ctx.currentTime);
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        noise.start();
+      } catch (e) {
+        // AudioContext disabled or blocked by policy
+      }
+    }
+
+    function showToast(text) {
+      indicatorText.textContent = text;
+      indicator.classList.remove('opacity-0');
+      indicator.classList.add('opacity-100');
+      setTimeout(() => {
+        indicator.classList.remove('opacity-100');
+        indicator.classList.add('opacity-0');
+      }, 1500);
+    }
+
+    // Interactive 3D Flip Execution
+    function flipForward() {
+      if (isAnimating || isFlipped) return;
+      isAnimating = true;
+      playPageSound();
+
+      flipper.classList.remove('page-turn-bwd');
+      flipper.classList.add('page-turn-fwd');
+
+      setTimeout(() => {
+        isFlipped = true;
+        isAnimating = false;
+        flipper.style.transform = 'rotateY(-180deg)';
+        flipper.classList.remove('page-turn-fwd');
+        btnFlipLabel.textContent = 'Volver (Pág. 42)';
+        progressFill.style.width = '24%';
+        progressLabel.textContent = '24% completado';
+        showToast('Página 43 de 180');
+      }, 850);
+    }
+
+    function flipBackward() {
+      if (isAnimating || !isFlipped) return;
+      isAnimating = true;
+      playPageSound();
+
+      flipper.classList.remove('page-turn-fwd');
+      flipper.classList.add('page-turn-bwd');
+
+      setTimeout(() => {
+        isFlipped = false;
+        isAnimating = false;
+        flipper.style.transform = 'rotateY(0deg)';
+        flipper.classList.remove('page-turn-bwd');
+        btnFlipLabel.textContent = 'Voltear Hoja (3D)';
+        progressFill.style.width = '23%';
+        progressLabel.textContent = '23% completado';
+        showToast('Página 42 de 180');
+      }, 850);
+    }
+
+    function toggleFlip() {
+      if (isFlipped) {
+        flipBackward();
+      } else {
+        flipForward();
+      }
+    }
+
+    // Trigger assignments
+    curl.addEventListener('click', flipForward);
+    versoCurl.addEventListener('click', flipBackward);
+    btnNext.addEventListener('click', flipForward);
+    btnPrev.addEventListener('click', flipBackward);
+    btnFlipToggle.addEventListener('click', toggleFlip);
+
+    // Subtle 3D Peel anticipation on mouse hover or touch press near corner
+    curl.addEventListener('mouseenter', () => {
+      if (!isAnimating && !isFlipped) {
+        flipper.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.4, 1)';
+        flipper.style.transform = 'rotateY(-14deg) skewY(-0.8deg)';
+      }
+    });
+
+    curl.addEventListener('mouseleave', () => {
+      if (!isAnimating && !isFlipped) {
+        flipper.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.4, 1)';
+        flipper.style.transform = 'rotateY(0deg)';
+      }
+    });
+
+    // Mobile touch swipe gestures
+    let touchStartX = 0;
+    let touchStartY = 0;
+    const bookStage = document.getElementById('book-stage');
+
+    bookStage.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    bookStage.addEventListener('touchend', (e) => {
+      const touchEndX = e.changedTouches[0].screenX;
+      const touchEndY = e.changedTouches[0].screenY;
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+
+      // Horizontal swipe detected
+      if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY)) {
+        if (diffX < 0) {
+          // Swipe left -> flip forward
+          flipForward();
+        } else {
+          // Swipe right -> flip back
+          flipBackward();
+        }
+      }
+    }, { passive: true });
+
+    // Keyboard navigation (ArrowLeft / ArrowRight)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+        flipForward();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        flipBackward();
+      }
+    });
+
+    // Font size toggles
+    btnFontInc.addEventListener('click', () => {
+      if (currentFontSize < 25) {
+        currentFontSize += 2;
+        content.style.fontSize = currentFontSize + 'px';
+        content.style.lineHeight = (currentFontSize + 12) + 'px';
+        underlayContent.style.fontSize = currentFontSize + 'px';
+        underlayContent.style.lineHeight = (currentFontSize + 12) + 'px';
+      }
+    });
+
+    btnFontDec.addEventListener('click', () => {
+      if (currentFontSize > 17) {
+        currentFontSize -= 2;
+        content.style.fontSize = currentFontSize + 'px';
+        content.style.lineHeight = (currentFontSize + 11) + 'px';
+        underlayContent.style.fontSize = currentFontSize + 'px';
+        underlayContent.style.lineHeight = (currentFontSize + 11) + 'px';
+      }
+    });
+
+    // Bookmark toggle
+    btnBookmark.addEventListener('click', () => {
+      isBookmarked = !isBookmarked;
+      if (isBookmarked) {
+        bookmarkIcon.style.fontVariationSettings = "'FILL' 1";
+        btnBookmark.classList.add('text-primary');
+        btnBookmark.classList.remove('text-outline');
+        showToast('Marcador guardado en Pág. ' + (isFlipped ? '43' : '42'));
+      } else {
+        bookmarkIcon.style.fontVariationSettings = "'FILL' 0";
+        btnBookmark.classList.remove('text-primary');
+        btnBookmark.classList.add('text-outline');
+        showToast('Marcador eliminado');
+      }
+    });
+
+    // Marginalia modal drawer toggles
+    btnMarginalia.addEventListener('click', () => {
+      drawer.classList.remove('hidden');
+    });
+
+    btnToc.addEventListener('click', () => {
+      drawer.classList.remove('hidden');
+    });
+
+    btnCloseDrawer.addEventListener('click', () => {
+      drawer.classList.add('hidden');
+    });
+
+    drawer.addEventListener('click', (e) => {
+      if (e.target === drawer) {
+        drawer.classList.add('hidden');
+      }
+    });
+
+    // Paper background switches (all layers conform)
+    const paperThemes = {
+      ivory: { bg: '#FAF6EE', text: '#26221F', note: '#F3ECE0' },
+      cream: { bg: '#F4EBE1', text: '#2E2721', note: '#E9DDD1' },
+      white: { bg: '#FFFFFF', text: '#1E1B18', note: '#F5F5F5' },
+      night: { bg: '#23201D', text: '#D8CEC4', note: '#2F2B27' }
+    };
+
+    swatches.forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        swatches.forEach(s => s.classList.remove('ring-2', 'ring-primary'));
+        swatch.classList.add('ring-2', 'ring-primary');
+        const themeKey = swatch.getAttribute('data-paper');
+        const theme = paperThemes[themeKey];
+        if (theme) {
+          leaf.style.backgroundColor = theme.bg;
+          leaf.style.color = theme.text;
+          content.style.color = theme.text;
+          versoLeaf.style.backgroundColor = theme.bg;
+          versoLeaf.style.color = theme.text;
+          underlay.style.backgroundColor = theme.bg;
+          underlay.style.color = theme.text;
+          underlayContent.style.color = theme.text;
+        }
+      });
+    });
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.03)]" data-active-classes="text-primary font-semibold"><div class="flex justify-around items-center h-16 px-space-sm"><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-colors" data-path="library" href="#"><span class="material-symbols-outlined text-[22px]">menu_book</span><span class="font-label-sm text-label-sm mt-0.5">Estantería</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] transition-colors text-primary font-semibold" data-path="reader" href="#"><span class="material-symbols-outlined text-[22px]">bookmark</span><span class="font-label-sm text-label-sm mt-0.5">Lectura</span></a><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-colors" data-path="notebook" href="#"><span class="material-symbols-outlined text-[22px]">ink_pen</span><span class="font-label-sm text-label-sm mt-0.5">Cuaderno</span></a><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined text-[22px]">tune</span><span class="font-label-sm text-label-sm mt-0.5">Ajustes</span></a></div></nav></body></html>

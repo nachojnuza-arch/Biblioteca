@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitio estático sin datos personales ni endpoints privados.
+Sitemap: https://athenaeum.example.com/sitemap-index.xml

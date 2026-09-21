@@ -1,0 +1,675 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import type { ReaderConfig } from '@/lib/reader/types';
+import { getPublishedBooks } from '@/lib/books';
+
+// Fuentes alternativas seleccionables desde Ajustes (self-hosted).
+import '@fontsource-variable/playfair-display';
+import '@fontsource-variable/merriweather';
+
+export async function getStaticPaths() {
+  const books = await getPublishedBooks();
+  return books.map((book) => ({
+    params: { slug: book.slug },
+    props: { book },
+  }));
+}
+
+const { book } = Astro.props;
+
+const config: ReaderConfig = {
+  bookSlug: book.slug,
+  bookTitle: book.data.title,
+  bookSubtitle: book.data.subtitle,
+  author: book.data.author,
+  coverPalette: book.data.coverPalette,
+  chapters: book.chapters.map((ch) => ({
+    number: ch.data.number,
+    title: ch.data.title,
+    location: ch.data.location,
+    html: ch.html,
+  })),
+};
+
+// SEGURIDAD: se inyecta JSON en <script type="application/json">.
+// Se escapa "<" para neutralizar cualquier cierre </script> (aunque el
+// contenido proviene del propio build, es defensa en profundidad).
+const configJson = JSON.stringify(config).replace(/</g, '\\u003c');
+---
+
+<BaseLayout
+  title={`Leyendo: ${book.data.title}`}
+  description={`Lectura inmersiva de «${book.data.title}», ${book.data.subtitle}, de ${book.data.author}. Lector con efecto de hoja 3D.`}
+  activePath="reader"
+  hideNav={true}
+>
+  <div id="reader-wrapper" class="flex flex-col w-full relative select-none max-w-5xl mx-auto w-full h-[100dvh] transition-all duration-500 overflow-hidden pt-space-xs pb-space-xs">
+    <!-- Configuración del lector (renderizada en build, validada en cliente) -->
+    <script id="reader-config" type="application/json" set:html={configJson} />
+
+    <!-- Barra de contexto: tomo · título · índice · marcador -->
+    <div
+      class="w-full px-gutter-mobile pt-space-xs pb-space-sm flex items-center justify-between"
+    >
+      <div class="flex items-center gap-space-xs text-on-surface-variant min-w-0">
+        <a 
+          href={`/libro/${book.slug}`}
+          class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors"
+          title="Volver"
+          aria-label="Volver"
+        >
+          <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_back</span>
+        </a>
+        <span
+          class="material-symbols-outlined text-[18px] text-primary"
+          style="font-variation-settings: 'FILL' 1;"
+          aria-hidden="true">auto_stories</span>
+        <span
+          class="font-ui text-label-sm uppercase tracking-widest text-primary font-semibold"
+          >Tomo I</span
+        >
+        <span class="text-outline-variant" aria-hidden="true">•</span>
+        <span
+          class="font-ui text-label-sm text-on-surface-variant truncate max-w-[170px]"
+          id="bar-book-title">{book.data.title}</span
+        >
+      </div>
+      <div class="flex items-center gap-space-xs">
+        <button
+          aria-label="Pantalla completa"
+          class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors"
+          id="btn-fullscreen"
+          title="Pantalla completa"
+        >
+          <span class="material-symbols-outlined text-[20px]" aria-hidden="true">fullscreen</span>
+        </button>
+        <button
+          aria-label="Índice de capítulos"
+          class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-container-high transition-colors shadow-sm"
+          id="btn-toc"
+          type="button"
+        >
+          <span class="material-symbols-outlined text-[19px]" aria-hidden="true"
+            >format_list_bulleted</span
+          >
+        </button>
+        <button
+          aria-label="Guardar marcapáginas"
+          aria-pressed="false"
+          class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-surface-container-high transition-colors shadow-sm"
+          id="btn-bookmark"
+          type="button"
+        >
+          <span
+            class="material-symbols-outlined text-[19px]"
+            id="bookmark-icon"
+            style="font-variation-settings: 'FILL' 0;"
+            aria-hidden="true">bookmark</span
+          >
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ Escenario del libro (3 capas: base + hoja que rota) ══ -->
+    <div class="w-full px-margin-mobile pb-space-sm perspective-book">
+      <div
+        class="relative w-full h-[66dvh] min-h-[560px] max-h-[840px] rounded-lg shadow-[0_4px_24px_rgba(43,39,36,0.08),0_1px_4px_rgba(43,39,36,0.04)] preserve-3d bg-[#FAF6EE] overflow-hidden"
+        id="reader-stage"
+        aria-live="polite"
+      >
+        <!-- Capa base (página siguiente) -->
+        <div
+          class="absolute inset-0 w-full h-full rounded-lg overflow-hidden pointer-events-none"
+          id="underlay-leaf"
+        >
+          <div class="absolute inset-y-0 left-0 w-6 spine-crease pointer-events-none z-10"></div>
+          <div
+            class="absolute inset-y-0 left-0 w-1 bg-black/20 pointer-events-none z-10"
+          ></div>
+          <div class="absolute inset-0 paper-grain pointer-events-none"></div>
+          <div class="relative z-0 px-6 pt-7 pb-4 flex flex-col h-full">
+            <article
+              class="reader-body flex-1 overflow-hidden"
+              id="underlay-content"
+              aria-hidden="true"
+            ></article>
+            <footer
+              class="mt-3 pt-3 border-t border-outline/20 flex items-center justify-between font-ui text-label-md text-outline"
+            >
+              <span id="underlay-chapter">Capítulo</span>
+              <div class="flex items-center gap-1.5 font-ui text-label-sm tracking-wider">
+                <span class="text-primary font-semibold" id="underlay-page-num">–</span>
+                <span>/</span>
+                <span id="total-pages">–</span>
+              </div>
+              <span id="underlay-location"></span>
+            </footer>
+          </div>
+        </div>
+
+        <!-- Capa estática izquierda (página actual, solo visible en escritorio) -->
+        <div
+          class="hidden lg:block absolute inset-0 w-full h-full rounded-lg overflow-hidden pointer-events-none z-10"
+          id="static-front-leaf"
+          style="clip-path: inset(0 50% 0 0);"
+        >
+          <div class="absolute inset-y-0 left-0 w-6 spine-crease pointer-events-none z-10"></div>
+          <div class="absolute inset-y-0 left-0 w-1 bg-black/15 pointer-events-none z-10"></div>
+          <div class="absolute inset-0 paper-grain pointer-events-none"></div>
+          <div class="relative z-0 px-6 pt-7 pb-4 flex flex-col h-full bg-[#FAF6EE]" id="static-front-bg">
+            <article class="reader-body flex-1 overflow-hidden" id="static-front-content" aria-hidden="true"></article>
+            <footer class="mt-3 pt-3 border-t border-outline/20 flex items-center justify-between font-ui text-label-md text-outline">
+              <span id="static-front-chapter">Capítulo</span>
+              <div class="flex items-center gap-1.5 font-ui text-label-sm tracking-wider">
+                <span class="text-primary font-semibold" id="static-front-page-num">1</span>
+                <span>/</span>
+                <span id="static-total-pages-front">–</span>
+              </div>
+              <span id="static-front-location"></span>
+            </footer>
+          </div>
+        </div>
+
+        <!-- Hoja que rota -->
+        <div
+          class="absolute inset-0 w-full h-full preserve-3d z-20 origin-left lg:origin-center"
+          id="flipper-page"
+        >
+          <!-- Cara frontal -->
+          <div
+            class="absolute inset-0 w-full h-full rounded-lg bg-[#FAF6EE] shadow-[0_4px_24px_rgba(43,39,36,0.08),0_1px_4px_rgba(43,39,36,0.04)] overflow-hidden backface-hidden lg:[clip-path:inset(0_0_0_50%)]"
+            id="front-leaf"
+          >
+            <div class="absolute inset-y-0 left-0 w-6 spine-crease pointer-events-none z-10"></div>
+            <div
+              class="absolute inset-y-0 left-0 w-1 bg-black/15 pointer-events-none z-10"
+            ></div>
+            <div class="absolute inset-0 paper-grain pointer-events-none"></div>
+            <div class="relative z-0 px-6 pt-7 pb-4 flex flex-col h-full">
+              <article class="reader-body flex-1 overflow-hidden" id="front-content"></article>
+              <footer
+                class="mt-3 pt-3 border-t border-outline/20 flex items-center justify-between font-ui text-label-md text-outline"
+              >
+                <span id="front-chapter">Capítulo</span>
+                <div class="flex items-center gap-1.5 font-ui text-label-sm tracking-wider">
+                  <span class="text-primary font-semibold" id="front-page-num">1</span>
+                  <span>/</span>
+                  <span id="total-pages-front">–</span>
+                </div>
+                <span id="front-location"></span>
+              </footer>
+            </div>
+
+            <!-- Esquina interactiva: avanzar -->
+            <div
+              aria-label="Voltear hoja adelante"
+              class="absolute bottom-0 right-0 w-28 h-28 cursor-pointer group z-30"
+              id="page-curl-trigger"
+              role="button"
+              tabindex="0"
+              title="Voltear página"
+            >
+              <div
+                class="absolute bottom-0 right-0 w-16 h-16 bg-gradient-to-tl from-black/25 via-black/10 to-transparent pointer-events-none transition-all duration-300 group-hover:w-20 group-hover:h-20"
+              >
+              </div>
+              <div
+                class="absolute bottom-0 right-0 w-12 h-12 bg-gradient-to-br from-[#ECE5D8] via-[#E2D9C8] to-[#D5C9B3] rounded-tl-xl shadow-[-3px_-3px_10px_rgba(43,39,36,0.18)] transition-all duration-300 group-hover:w-16 group-hover:h-16 flex items-center justify-center"
+              >
+                <span
+                  class="material-symbols-outlined text-primary/80 text-[18px] rotate-45 ml-2 mt-2 transition-transform group-hover:scale-110"
+                  aria-hidden="true">arrow_back</span
+                >
+              </div>
+            </div>
+            <div
+              class="absolute bottom-4 left-6 z-10 flex items-center gap-1.5 text-outline pointer-events-none"
+            >
+              <span
+                class="material-symbols-outlined text-[15px] animate-pulse text-primary"
+                aria-hidden="true">swipe_left</span
+              >
+              <span class="font-ui text-label-sm uppercase tracking-wider"
+                >Toca la esquina para voltear</span
+              >
+            </div>
+          </div>
+
+          <!-- Cara trasera (verso) -->
+          <div
+            class="absolute inset-0 w-full h-full rounded-lg bg-[#FAF6EE] shadow-[-6px_4px_24px_rgba(43,39,36,0.12)] overflow-hidden backface-hidden lg:[clip-path:inset(0_50%_0_0)]"
+            id="back-leaf"
+            style="transform: rotateY(180deg);"
+          >
+            <div
+              class="absolute inset-y-0 right-0 w-6 spine-crease pointer-events-none z-10"
+              style="transform: scaleX(-1);"
+            >
+            </div>
+            <div
+              class="absolute inset-y-0 right-0 w-1 bg-black/15 pointer-events-none z-10"
+            ></div>
+            <div class="absolute inset-0 paper-grain pointer-events-none"></div>
+            <div class="relative z-0 px-6 pt-7 pb-4 flex flex-col h-full">
+              <article
+                class="reader-body flex-1 overflow-hidden"
+                id="back-content"
+                aria-hidden="true"
+              ></article>
+              <footer
+                class="mt-3 pt-3 border-t border-outline/20 flex items-center justify-between font-ui text-label-md text-outline"
+              >
+                <span id="back-chapter">Capítulo</span>
+                <div class="flex items-center gap-1.5 font-ui text-label-sm tracking-wider">
+                  <span class="text-primary font-semibold" id="back-page-num">2</span>
+                  <span>/</span>
+                  <span>–</span>
+                </div>
+                <span id="back-location"></span>
+              </footer>
+            </div>
+
+            <!-- Esquina interactiva: retroceder -->
+            <div
+              aria-label="Voltear hoja atrás"
+              class="absolute bottom-0 left-0 w-28 h-28 cursor-pointer group z-30"
+              id="verso-curl-trigger"
+              role="button"
+              tabindex="0"
+              title="Volver página anterior"
+            >
+              <div
+                class="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-black/25 via-black/10 to-transparent pointer-events-none transition-all duration-300 group-hover:w-20 group-hover:h-20"
+              >
+              </div>
+              <div
+                class="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-bl from-[#ECE5D8] via-[#E2D9C8] to-[#D5C9B3] rounded-tr-xl shadow-[3px_-3px_10px_rgba(43,39,36,0.18)] transition-all duration-300 group-hover:w-16 group-hover:h-16 flex items-center justify-center"
+              >
+                <span
+                  class="material-symbols-outlined text-primary/80 text-[18px] -rotate-45 mr-2 mt-2 transition-transform group-hover:scale-110"
+                  aria-hidden="true">arrow_forward</span
+                >
+              </div>
+            </div>
+            <div
+              class="absolute bottom-4 right-6 z-10 flex items-center gap-1.5 text-outline pointer-events-none"
+            >
+              <span class="font-ui text-label-sm uppercase tracking-wider">Toca para volver</span>
+              <span
+                class="material-symbols-outlined text-[15px] animate-pulse text-primary"
+                aria-hidden="true">swipe_right</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controles de navegación -->
+    <div class="w-full px-margin-mobile mb-space-xs flex items-center justify-between">
+      <button
+        class="flex items-center gap-1 font-ui text-label-sm uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors py-1.5 px-3 rounded-full bg-surface-container/70 active:scale-95"
+        id="btn-prev-page"
+        type="button"
+      >
+        <span class="material-symbols-outlined text-[16px]" aria-hidden="true">chevron_left</span>
+        <span>Anterior</span>
+      </button>
+      <button
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container text-primary font-ui text-label-sm font-semibold hover:bg-surface-container-high transition-all shadow-sm active:scale-95"
+        id="btn-flip-toggle"
+        type="button"
+      >
+        <span
+          class="material-symbols-outlined text-[15px]"
+          style="font-variation-settings: 'FILL' 1;"
+          aria-hidden="true">flip</span
+        >
+        <span id="btn-flip-label">Página 1</span>
+      </button>
+      <button
+        class="flex items-center gap-1 font-ui text-label-sm uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors py-1.5 px-3 rounded-full bg-surface-container/70 active:scale-95"
+        id="btn-next-page"
+        type="button"
+      >
+        <span>Siguiente</span>
+        <span class="material-symbols-outlined text-[16px]" aria-hidden="true"
+          >chevron_right</span
+        >
+      </button>
+    </div>
+
+    <!-- Progreso -->
+    <div class="w-full px-margin-mobile mb-space-sm flex flex-col gap-1.5">
+      <div class="flex items-center justify-between text-on-surface-variant font-ui text-label-sm">
+        <span class="flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>
+          <span>Progreso general</span>
+        </span>
+        <span class="font-semibold text-primary" id="progress-percent-label">0% completado</span>
+      </div>
+      <div
+        class="w-full h-1.5 rounded-full bg-surface-container-high overflow-hidden relative shadow-inner cursor-pointer"
+        id="progress-rail"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        tabindex="0"
+        aria-label="Progreso de lectura"
+      >
+        <div
+          class="h-full bg-primary rounded-full transition-all duration-300"
+          id="progress-fill"
+          style="width: 0%;"
+        >
+        </div>
+      </div>
+    </div>
+
+    <!-- Dock de ajustes rápidos -->
+    <div class="w-full px-margin-mobile mb-space-md">
+      <div
+        class="w-full rounded-full bg-surface-container-lowest shadow-[0_8px_30px_rgba(43,39,36,0.06)] p-1.5 flex items-center justify-between"
+      >
+        <div class="flex items-center bg-surface-container rounded-full p-0.5">
+          <button
+            aria-label="Reducir tipografía"
+            class="w-9 h-9 rounded-full flex items-center justify-center text-on-surface hover:bg-surface transition-colors font-reading text-sm"
+            id="btn-font-dec"
+            type="button"
+          >
+            A
+          </button>
+          <span class="w-px h-3.5 bg-outline-variant/30"></span>
+          <button
+            aria-label="Aumentar tipografía"
+            class="w-9 h-9 rounded-full flex items-center justify-center text-on-surface hover:bg-surface transition-colors font-reading text-base font-bold"
+            id="btn-font-inc"
+            type="button"
+          >
+            A+
+          </button>
+        </div>
+        <div class="flex items-center gap-1.5 px-2" role="group" aria-label="Color del papel">
+          <button
+            class="paper-swatch w-6 h-6 rounded-full bg-[#FAF6EE] shadow-sm ring-2 ring-primary transition-all"
+            data-paper="ivory"
+            title="Marfil cálido"
+            aria-pressed="true"
+            type="button"
+          ></button>
+          <button
+            class="paper-swatch w-6 h-6 rounded-full bg-[#F4EBE1] shadow-sm hover:scale-105 transition-all"
+            data-paper="cream"
+            title="Pergamino antiguo"
+            aria-pressed="false"
+            type="button"
+          ></button>
+          <button
+            class="paper-swatch w-6 h-6 rounded-full bg-[#FFFFFF] shadow-sm hover:scale-105 transition-all"
+            data-paper="white"
+            title="Blanco óptico"
+            aria-pressed="false"
+            type="button"
+          ></button>
+          <button
+            class="paper-swatch w-6 h-6 rounded-full bg-[#23201D] shadow-sm hover:scale-105 transition-all"
+            data-paper="night"
+            title="Modo noche"
+            aria-pressed="false"
+            type="button"
+          ></button>
+        </div>
+        <button
+          aria-label="Abrir notas y apuntes"
+          class="flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary-container text-on-secondary-container hover:bg-secondary-fixed transition-colors shadow-sm"
+          id="btn-marginalia"
+          type="button"
+        >
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">ink_pen</span>
+          <span class="font-ui text-label-sm font-semibold">Notas (<span id="notes-count">0</span>)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Drawer: Índice de capítulos -->
+    <div
+      class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex justify-end transition-opacity"
+      id="drawer-toc"
+    >
+      <div
+        class="w-5/6 max-w-sm h-full bg-surface-container-lowest p-space-md shadow-2xl flex flex-col overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Índice de capítulos"
+      >
+        <div class="flex items-center justify-between pb-space-sm">
+          <div class="flex items-center gap-2 text-primary">
+            <span class="material-symbols-outlined" aria-hidden="true">menu_book</span>
+            <h3 class="font-reading text-headline-sm">Índice del Libro</h3>
+          </div>
+          <button
+            class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-container-high"
+            id="btn-close-toc"
+            type="button"
+            aria-label="Cerrar índice"
+          >
+            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">close</span>
+          </button>
+        </div>
+        <ol class="flex flex-col gap-1" id="toc-list"></ol>
+      </div>
+    </div>
+
+    <!-- Drawer: Notas del lector -->
+    <div
+      class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex justify-end transition-opacity"
+      id="drawer-notes"
+    >
+      <div
+        class="w-5/6 max-w-sm h-full bg-surface-container-lowest p-space-md shadow-2xl flex flex-col gap-space-md overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Notas del lector"
+      >
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2 text-primary">
+            <span class="material-symbols-outlined" aria-hidden="true">ink_pen</span>
+            <h3 class="font-reading text-headline-sm">Notas del Manuscrito</h3>
+          </div>
+          <button
+            class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-container-high"
+            id="btn-close-notes"
+            type="button"
+            aria-label="Cerrar notas"
+          >
+            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">close</span>
+          </button>
+        </div>
+        <form class="flex flex-col gap-2" id="note-form">
+          <label class="font-ui text-label-sm uppercase tracking-wider text-on-surface-variant" for="note-input">
+            Nueva anotación (página actual)
+          </label>
+          <textarea
+            class="w-full min-h-[90px] p-3 rounded-lg bg-surface-container-low border border-outline-variant/40 focus:border-primary outline-none font-reading text-reading-base text-on-surface resize-y"
+            id="note-input"
+            maxlength="2000"
+            placeholder="Escribí tu anotación al margen…"
+          ></textarea>
+          <button
+            class="w-full py-2.5 rounded-lg bg-primary text-on-primary font-ui text-label-md uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:bg-primary-container transition-colors"
+            type="submit"
+          >
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">add</span>
+            <span>Añadir Anotación</span>
+          </button>
+        </form>
+        <div class="flex flex-col gap-2" id="notes-list"></div>
+      </div>
+    </div>
+
+    <!-- Toast de confirmación -->
+    <div
+      class="pointer-events-none fixed bottom-24 left-1/2 -translate-x-1/2 opacity-0 transition-opacity duration-300 bg-inverse-surface/90 text-inverse-on-surface px-4 py-1.5 rounded-full flex items-center gap-2 shadow-lg z-50"
+      id="page-turn-indicator"
+    >
+      <span
+        class="material-symbols-outlined text-[16px] text-primary-fixed-dim"
+        aria-hidden="true">auto_stories</span
+      >
+      <span class="font-ui text-label-sm" id="page-indicator-text">Página 1</span>
+    </div>
+  </div>
+
+  <script>
+    import { bootReader } from '@/lib/reader/reader-app';
+    bootReader();
+
+    // Lógica de pantalla completa
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    btnFullscreen?.addEventListener('click', () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        document.documentElement.requestFullscreen();
+      }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      const isFull = !!document.fullscreenElement;
+      const wrapper = document.getElementById('reader-wrapper');
+      const stage = document.getElementById('reader-stage');
+      if (!btnFullscreen) return;
+      
+      if (wrapper && stage) {
+        if (isFull) {
+          wrapper.classList.remove('max-w-5xl');
+          wrapper.classList.add('max-w-none', 'h-screen', 'p-4');
+          stage.classList.remove('h-[66dvh]', 'max-h-[840px]');
+          stage.classList.add('flex-1', 'h-full', 'max-h-none');
+          btnFullscreen.innerHTML = '<span class="material-symbols-outlined text-[20px]">fullscreen_exit</span>';
+        } else {
+          wrapper.classList.add('max-w-5xl');
+          wrapper.classList.remove('max-w-none', 'h-screen', 'p-4');
+          stage.classList.add('h-[66dvh]', 'max-h-[840px]');
+          stage.classList.remove('flex-1', 'h-full', 'max-h-none');
+          btnFullscreen.innerHTML = '<span class="material-symbols-outlined text-[20px]">fullscreen</span>';
+        }
+      }
+      // Forzar un evento de resize para que repagine con las nuevas dimensiones
+      window.dispatchEvent(new Event('resize'));
+    });
+  </script>
+
+  <style>
+    @media (min-width: 1024px) {
+      .reader-body {
+        column-count: 2;
+        column-gap: 3.5rem;
+        column-fill: auto;
+      }
+    }
+
+    .reader-body {
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .reader-body :global(img),
+    .reader-body :global(pre),
+    .reader-body :global(table) {
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    /* ── Tipografía del cuerpo de la página ────────────────────
+       Compartida por las tres caras y la columna de medición:
+       la paginación depende de que estas reglas sean idénticas. */
+    .reader-body :global(p) {
+      margin: 0 0 1em;
+      text-wrap: pretty;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      orphans: 1;
+      widows: 1;
+    }
+
+    .reader-body :global(h2),
+    .reader-body :global(h3) {
+      margin: 0 0 0.6em;
+      orphans: 1;
+      widows: 1;
+      break-inside: auto;
+      break-after: auto;
+      break-before: auto;
+    }
+
+    .reader-body :global(blockquote) {
+      margin: 0 0 1em;
+      padding: 0.55em 0.75em;
+      border-left: 2px solid var(--color-primary);
+      border-radius: 0.5rem;
+      background: var(--paper-note-bg, #f3ece0);
+      font-style: italic;
+    }
+
+    .reader-body :global(blockquote p) {
+      margin: 0;
+    }
+
+    .reader-body :global(ul),
+    .reader-body :global(ol) {
+      margin: 0 0 1em;
+      padding-left: 1.4em;
+    }
+
+    .reader-body :global(li) {
+      margin-bottom: 0.35em;
+    }
+
+    /* Encabezado de capítulo (lo inyecta el paginador) */
+    .reader-body :global(.chapter-head) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 1.2em;
+    }
+
+    .reader-body :global(.chapter-kicker) {
+      font-family: var(--font-ui);
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--color-outline);
+      margin-bottom: 0.4em;
+    }
+
+    .reader-body :global(.chapter-title) {
+      font-family: var(--font-reading);
+      font-size: 1.35em;
+      font-weight: 500;
+      line-height: 1.3;
+      letter-spacing: -0.005em;
+      color: inherit;
+      margin: 0;
+    }
+
+    .reader-body :global(.chapter-head .deckle-divider) {
+      margin-top: 0.55em;
+      margin-bottom: 0.35em;
+    }
+
+    /* Capitular clásica en la primera página del capítulo */
+    .reader-body.chapter-opening :global(p:first-of-type)::first-letter {
+      float: left;
+      font-family: var(--font-reading);
+      font-size: 3.1em;
+      line-height: 0.85;
+      padding-top: 0.08em;
+      padding-right: 0.12em;
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+  </style>
+</BaseLayout>

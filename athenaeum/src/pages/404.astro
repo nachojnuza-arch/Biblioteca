@@ -1,0 +1,25 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Página no encontrada" description="La página buscada no existe en el archivo Athenaeum.">
+  <div class="flex flex-col items-center justify-center gap-4 min-h-[60dvh] px-gutter-mobile text-center">
+    <span class="material-symbols-outlined text-[56px] text-outline/60" aria-hidden="true">
+      travel_explore
+    </span>
+    <h1 class="font-reading text-display-lg-mobile md:text-display-lg text-on-surface">
+      Signatura no hallada
+    </h1>
+    <p class="font-reading text-reading-base text-on-surface-variant max-w-md">
+      «El archivo no conserva ninguna página bajo esta signatura. Quizá el lomo que buscás
+      duerme en otra estantería.»
+    </p>
+    <a
+      href="/"
+      class="mt-2 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-primary text-on-primary font-ui text-label-md uppercase tracking-wider shadow-md hover:bg-primary-container transition-colors"
+    >
+      <span class="material-symbols-outlined text-[17px]" aria-hidden="true">menu_book</span>
+      Volver a la estantería
+    </a>
+  </div>
+</BaseLayout>

@@ -1,0 +1,55 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getPublishedBooks } from '@/lib/books';
+
+const books = await getPublishedBooks();
+
+const lecturaInit = JSON.stringify({
+  books: books.map((b) => ({
+    slug: b.slug,
+    title: b.data.title,
+    author: b.data.author,
+    subtitle: b.data.subtitle,
+  })),
+}).replace(/</g, '\\u003c');
+---
+
+<BaseLayout
+  title="Lectura"
+  description="Retomá tus lecturas en curso o comenzá un nuevo manuscrito de la biblioteca."
+  activePath="reader"
+>
+  <div class="flex flex-col gap-space-lg max-w-3xl mx-auto w-full">
+    <section class="px-gutter-mobile pt-space-sm">
+      <h1 class="font-reading text-display-lg-mobile md:text-display-lg text-on-surface tracking-tight">
+        Mesa de Lectura
+      </h1>
+      <p class="font-ui text-body-base text-on-surface-variant mt-1">
+        Tu lectura te espera donde la dejaste. El progreso se guarda en este dispositivo.
+      </p>
+    </section>
+
+    <section class="px-gutter-mobile hidden" id="continue-section" aria-label="Lecturas en curso">
+      <h2 class="font-ui text-label-md uppercase tracking-wider text-on-surface-variant mb-3">
+        Lecturas en curso
+      </h2>
+      <div class="flex flex-col gap-3" id="continue-list"></div>
+    </section>
+
+    <section class="px-gutter-mobile pb-space-md" aria-label="Comenzar una lectura">
+      <h2 class="font-ui text-label-md uppercase tracking-wider text-on-surface-variant mb-3">
+        Comenzar una lectura
+      </h2>
+      <div class="hidden flex flex-col gap-2" id="start-grid"></div>
+    </section>
+  </div>
+
+  <script id="lectura-init-data" type="application/json" set:html={lecturaInit}></script>
+  <script>
+    import { bootLectura } from '@/lib/lectura/lectura-app';
+    const dataEl = document.getElementById('lectura-init-data');
+    if (dataEl) {
+      bootLectura(JSON.parse(dataEl.textContent));
+    }
+  </script>
+</BaseLayout>

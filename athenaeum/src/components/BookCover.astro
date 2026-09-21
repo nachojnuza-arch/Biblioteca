@@ -1,0 +1,82 @@
+---
+/**
+ * Portada tipográfica generada con CSS (sin imágenes).
+ * Simula una chaqueta de libro: título, subtítulo, sello editorial y autor,
+ * con lomo a la izquierda (radio asimétrico del design system).
+ */
+interface Props {
+  title: string;
+  subtitle?: string;
+  author: string;
+  palette?: 'terracotta' | 'olive' | 'burgundy' | 'ivory';
+  /** Tamaño relativo del texto del título */
+  compact?: boolean;
+  class?: string;
+}
+
+const { title, subtitle = '', author, palette = 'terracotta', compact = false, class: className } = Astro.props;
+
+const palettes = {
+  terracotta: { bg: '#9E4734', frame: '#FFDAD3', text: '#FFF8F5', accent: '#FFDAD3' },
+  olive: { bg: '#384639', frame: '#D7E7D5', text: '#FFF8F5', accent: '#D7E7D5' },
+  burgundy: { bg: '#782D20', frame: '#FFDAD4', text: '#FFF8F5', accent: '#FFDAD4' },
+  ivory: { bg: '#F4EFE6', frame: '#9E4734', text: '#2B2724', accent: '#9E4734' },
+} as const;
+
+const p = palettes[palette];
+---
+
+<div
+  class={`relative aspect-[2/3] rounded-l-none rounded-r-lg overflow-hidden flex flex-col items-center justify-between p-4 text-center ${className ?? ''}`}
+  style={`background: linear-gradient(160deg, ${p.bg} 0%, color-mix(in srgb, ${p.bg} 85%, #000) 100%); color: ${p.text}; box-shadow: inset 3px 0 6px -2px rgba(28,25,23,0.35), 2px 4px 16px rgba(43,39,36,0.07);`}
+  role="img"
+  aria-label={`Portada de ${title}, de ${author}`}
+>
+  <!-- Grano y doble filo editorial -->
+  <div class="absolute inset-0 paper-grain pointer-events-none" style="opacity: 0.08;"></div>
+  <div
+    class="absolute inset-2 border pointer-events-none rounded-sm"
+    style={`border-color: color-mix(in srgb, ${p.frame} 55%, transparent);`}
+  >
+  </div>
+  <!-- Lomo -->
+  <div
+    class="absolute inset-y-0 left-0 w-[7%] pointer-events-none"
+    style={`background: linear-gradient(to right, rgba(0,0,0,0.28), transparent);`}
+  >
+  </div>
+
+  <div class="relative z-1 pt-2 flex flex-col items-center gap-1">
+    <span
+      class="font-ui text-[9px] uppercase tracking-[0.28em]"
+      style={`color: ${p.frame};`}
+    >
+      Athenaeum Archival
+    </span>
+    <span class="material-symbols-outlined text-[14px]" style={`color: ${p.frame};`} aria-hidden="true">
+      auto_stories
+    </span>
+  </div>
+
+  <div class="relative z-1 flex flex-col items-center gap-2 px-2">
+    <h3
+      class={`font-reading font-medium leading-tight tracking-tight ${compact ? 'text-[15px]' : 'text-[19px]'}`}
+    >
+      {title}
+    </h3>
+    <span class="w-8 h-px" style={`background: color-mix(in srgb, ${p.frame} 60%, transparent);`}></span>
+    {
+      subtitle && (
+        <span class={`font-ui text-[9px] uppercase tracking-[0.14em] ${compact ? 'line-clamp-1' : 'line-clamp-2'}`} style={`color: color-mix(in srgb, ${p.text} 82%, transparent);`}>
+          {subtitle}
+        </span>
+      )
+    }
+  </div>
+
+  <div class="relative z-1 pb-2">
+    <span class="font-ui text-[9px] uppercase tracking-[0.22em]" style={`color: ${p.frame};`}>
+      {author}
+    </span>
+  </div>
+</div>

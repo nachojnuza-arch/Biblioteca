@@ -1,0 +1,284 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import '@fontsource-variable/playfair-display';
+import '@fontsource-variable/merriweather';
+---
+
+<BaseLayout
+  title="Ajustes de lectura"
+  description="Personalizá el efecto de paso de hojas, el color del papel, la tipografía y el sonido del lector Athenaeum."
+  activePath="settings"
+>
+  <div class="flex flex-col gap-space-lg max-w-3xl mx-auto w-full">
+    <section class="px-gutter-mobile pt-space-sm">
+      <h1 class="font-reading text-display-lg-mobile md:text-display-lg text-on-surface tracking-tight">
+        Ajustes de Lectura
+      </h1>
+      <p class="font-ui text-body-base text-on-surface-variant mt-1">
+        Modulá la cinemática del volteo, el tinte del papel y la composición tipográfica.
+        Las preferencias se guardan en este dispositivo y se aplican al abrir cualquier libro.
+      </p>
+    </section>
+
+    <!-- Previsualización -->
+    <section class="px-gutter-mobile" aria-label="Previsualización">
+      <div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant/25">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-ui text-label-sm uppercase tracking-[0.2em] text-outline">
+            Muestra de lectura
+          </span>
+          <span class="chip bg-secondary-fixed/60 text-secondary border-secondary/20">
+            Tiempo real
+          </span>
+        </div>
+        <div
+          id="settings-preview"
+          class="p-5 rounded-lg min-h-[120px] shadow-[0_1px_3px_rgba(43,39,36,0.04),0_4px_12px_rgba(43,39,36,0.03)] transition-colors duration-300 text-justify"
+        >
+        </div>
+      </div>
+    </section>
+
+    <!-- Efecto de pasaje de hojas -->
+    <section class="px-gutter-mobile" aria-label="Efecto de pasaje de hojas">
+      <h2 class="font-reading text-headline-md text-on-surface">Efecto de Pasaje de Hojas</h2>
+      <p class="font-ui text-body-sm text-on-surface-variant mt-0.5 mb-3">
+        La cadencia con la que las páginas ceden al tacto.
+      </p>
+      <div class="grid grid-cols-3 gap-2">
+        <button
+          class="p-3 rounded-lg bg-surface-container-lowest border text-center transition-colors hover:bg-surface-container-low"
+          data-setting="effect"
+          data-value="flip3d"
+          type="button"
+        >
+          <span class="material-symbols-outlined text-[22px] block mx-auto" aria-hidden="true"
+            >flip</span
+          >
+          <span class="font-ui text-label-md uppercase tracking-wider block mt-1"
+            >Volteo 3D</span
+          >
+          <span class="font-ui text-label-sm uppercase tracking-wider text-outline">Físico</span>
+        </button>
+        <button
+          class="p-3 rounded-lg bg-surface-container-lowest border text-center transition-colors hover:bg-surface-container-low"
+          data-setting="effect"
+          data-value="slide"
+          type="button"
+        >
+          <span class="material-symbols-outlined text-[22px] block mx-auto" aria-hidden="true"
+            >swipe</span
+          >
+          <span class="font-ui text-label-md uppercase tracking-wider block mt-1"
+            >Deslizamiento</span
+          >
+          <span class="font-ui text-label-sm uppercase tracking-wider text-outline">Suave</span>
+        </button>
+        <button
+          class="p-3 rounded-lg bg-surface-container-lowest border text-center transition-colors hover:bg-surface-container-low"
+          data-setting="effect"
+          data-value="fade"
+          type="button"
+        >
+          <span class="material-symbols-outlined text-[22px] block mx-auto" aria-hidden="true"
+            >blur_on</span
+          >
+          <span class="font-ui text-label-md uppercase tracking-wider block mt-1"
+            >Desvanecido</span
+          >
+          <span class="font-ui text-label-sm uppercase tracking-wider text-outline">Tinta</span>
+        </button>
+      </div>
+
+      <div
+        class="mt-3 flex items-center justify-between p-4 rounded-lg bg-surface-container-low border border-outline-variant/25"
+      >
+        <div>
+          <p class="font-ui text-label-md uppercase tracking-wider text-on-surface">
+            Sonido de papel al voltear
+          </p>
+          <p class="font-ui text-body-sm text-on-surface-variant">
+            Fricción acústica de celulosa natural (sintetizada, sin descargas).
+          </p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="sound-toggle" class="sr-only peer" />
+          <span
+            class="w-11 h-6 bg-surface-container-highest rounded-full peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:bg-white after:rounded-full after:transition-transform peer-checked:after:translate-x-5 after:shadow"
+          ></span>
+          <span class="sr-only">Activar sonido de papel</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Papel -->
+    <section class="px-gutter-mobile" aria-label="Color del papel">
+      <h2 class="font-reading text-headline-md text-on-surface">Soporte y Textura</h2>
+      <p class="font-ui text-body-sm text-on-surface-variant mt-0.5 mb-3">
+        Alinea el tinte del fondo al espectro de luz natural para preservar el descanso ocular.
+      </p>
+      <div class="grid grid-cols-4 gap-2">
+        <button
+          class="p-3 rounded-lg bg-surface-container-lowest border text-center transition-colors hover:bg-surface-container-low"
+          data-setting="paper"
+          data-value="ivory"
+          type="button"
+        >
+          <span class="w-8 h-8 rounded-full bg-[#FAF6EE] border border-outline-variant/40 block mx-auto"></span>
+          <span class="font-ui text-label-sm uppercase tracking-wider block mt-1.5">Marfil</span>
+        </button>
+        <button
+          class="p-3 rounded-lg bg-surface-container-lowest border text-center transition-colors hover:bg-surface-container-low"
+          data-setting="paper"
+          data-value="cream"
+          type="button"
+        >
+          <span class="w-8 h-8 rounded-full bg-[#F4EBE1] border border-outline-variant/40 block mx-auto"></span>
+          <span class="font-ui text-label-sm uppercase tracking-wider block mt-1.5"
+            >Pergamino</span
+          >
+        </button>
+        <button
+          class="p-3 rounded-lg bg-surface-container-lowest border text-center transition-colors hover:bg-surface-container-low"
+          data-setting="paper"
+          data-value="white"
+          type="button"
+        >
+          <span class="w-8 h-8 rounded-full bg-[#FFFFFF] border border-outline-variant/40 block mx-auto"></span>
+          <span class="font-ui text-label-sm uppercase tracking-wider block mt-1.5">Puro</span>
+        </button>
+        <button
+          class="p-3 rounded-lg bg-surface-container-lowest border text-center transition-colors hover:bg-surface-container-low"
+          data-setting="paper"
+          data-value="night"
+          type="button"
+        >
+          <span class="w-8 h-8 rounded-full bg-[#23201D] border border-outline-variant/40 block mx-auto"></span>
+          <span class="font-ui text-label-sm uppercase tracking-wider block mt-1.5">Noche</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Tipografía -->
+    <section class="px-gutter-mobile pb-space-md" aria-label="Tipografía y composición">
+      <h2 class="font-reading text-headline-md text-on-surface">Tipografía y Composición</h2>
+      <p class="font-ui text-body-sm text-on-surface-variant mt-0.5 mb-3">
+        Familias serif clásicas grabadas para lectura prolongada sin fatiga.
+      </p>
+
+      <div class="flex flex-col gap-3">
+        <div class="grid grid-cols-3 gap-2">
+          <button
+            class="py-2.5 rounded-lg bg-surface-container-lowest border text-center font-reading text-body-base transition-colors hover:bg-surface-container-low"
+            data-setting="font"
+            data-value="garamond"
+            type="button"
+          >
+            EB Garamond
+          </button>
+          <button
+            class="py-2.5 rounded-lg bg-surface-container-lowest border text-center font-reading text-body-base transition-colors hover:bg-surface-container-low"
+            data-setting="font"
+            data-value="playfair"
+            type="button"
+          >
+            Playfair Display
+          </button>
+          <button
+            class="py-2.5 rounded-lg bg-surface-container-lowest border text-center font-reading text-body-base transition-colors hover:bg-surface-container-low"
+            data-setting="font"
+            data-value="merriweather"
+            type="button"
+          >
+            Merriweather
+          </button>
+        </div>
+
+        <div
+          class="flex items-center justify-between p-4 rounded-lg bg-surface-container-low border border-outline-variant/25"
+        >
+          <div>
+            <p class="font-ui text-label-md uppercase tracking-wider text-on-surface">
+              Cuerpo de texto
+            </p>
+            <p class="font-ui text-body-sm text-on-surface-variant" id="font-size-label">
+              21 px
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              class="w-10 h-10 rounded-full bg-surface-container-lowest border border-outline-variant/40 font-reading text-sm hover:bg-surface-container-low transition-colors"
+              id="font-size-dec"
+              type="button"
+              aria-label="Reducir tamaño de texto"
+            >
+              A
+            </button>
+            <button
+              class="w-10 h-10 rounded-full bg-surface-container-lowest border border-outline-variant/40 font-reading text-base font-bold hover:bg-surface-container-low transition-colors"
+              id="font-size-inc"
+              type="button"
+              aria-label="Aumentar tamaño de texto"
+            >
+              A+
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <p class="font-ui text-label-md uppercase tracking-wider text-on-surface mb-2">
+            Interlineado
+          </p>
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              class="py-2 rounded-lg bg-surface-container-lowest border text-center font-ui text-label-sm uppercase tracking-wider transition-colors hover:bg-surface-container-low"
+              data-setting="lineSpacing"
+              data-value="estrecho"
+              type="button"
+            >
+              Estrecho
+            </button>
+            <button
+              class="py-2 rounded-lg bg-surface-container-lowest border text-center font-ui text-label-sm uppercase tracking-wider transition-colors hover:bg-surface-container-low"
+              data-setting="lineSpacing"
+              data-value="comodo"
+              type="button"
+            >
+              Cómodo
+            </button>
+            <button
+              class="py-2 rounded-lg bg-surface-container-lowest border text-center font-ui text-label-sm uppercase tracking-wider transition-colors hover:bg-surface-container-low"
+              data-setting="lineSpacing"
+              data-value="amplio"
+              type="button"
+            >
+              Amplio
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Acción -->
+    <section class="px-gutter-mobile pb-space-md">
+      <a
+        href="/lectura"
+        class="w-full py-3 rounded-lg bg-primary text-on-primary font-ui text-label-md uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:bg-primary-container transition-colors"
+      >
+        <span class="material-symbols-outlined text-[19px]" aria-hidden="true">auto_stories</span>
+        Probar ajustes en el lector
+      </a>
+
+        <p class="mt-1 text-center font-ui text-body-sm text-on-surface-variant">
+          Las preferencias se sincronizan automáticamente con tu biblioteca privada Athenaeum
+          (almacenamiento local de este navegador).
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    import { bootSettings } from '@/lib/settings/settings-app';
+    bootSettings();
+  </script>
+</BaseLayout>

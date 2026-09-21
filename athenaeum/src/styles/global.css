@@ -1,0 +1,323 @@
+/*
+ * Athenaeum — Sistema de diseño global
+ * Tokens migrados de athenaeum_editorial/DESIGN.md a la configuración
+ * CSS-first de Tailwind 4 (@theme). Sin dependencias externas en runtime.
+ */
+@import 'tailwindcss';
+
+@theme {
+  /* ── Paleta: Athenaeum Editorial ─────────────────────────── */
+  --color-surface: #fff8f5;
+  --color-surface-dim: #e1d8d4;
+  --color-surface-bright: #fff8f5;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #fbf2ed;
+  --color-surface-container: #f5ece7;
+  --color-surface-container-high: #efe6e1;
+  --color-surface-container-highest: #e9e1dc;
+  --color-on-surface: #1e1b18;
+  --color-on-surface-variant: #55423e;
+  --color-inverse-surface: #34302c;
+  --color-inverse-on-surface: #f8efea;
+  --color-outline: #88726d;
+  --color-outline-variant: #dbc1bb;
+  --color-surface-tint: #9a4431;
+  --color-primary: #7f301f;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #9e4734;
+  --color-on-primary-container: #ffd4ca;
+  --color-inverse-primary: #ffb4a4;
+  --color-secondary: #546254;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #d4e4d2;
+  --color-on-secondary-container: #586658;
+  --color-tertiary: #7e3124;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #9c4839;
+  --color-on-tertiary-container: #ffd3cb;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-primary-fixed: #ffdad3;
+  --color-primary-fixed-dim: #ffb4a4;
+  --color-on-primary-fixed: #3e0500;
+  --color-on-primary-fixed-variant: #7b2d1d;
+  --color-secondary-fixed: #d7e7d5;
+  --color-secondary-fixed-dim: #bbcbb9;
+  --color-on-secondary-fixed: #111e14;
+  --color-on-secondary-fixed-variant: #3c4a3d;
+  --color-tertiary-fixed: #ffdad4;
+  --color-tertiary-fixed-dim: #ffb4a6;
+  --color-on-tertiary-fixed: #3f0400;
+  --color-on-tertiary-fixed-variant: #7a2e21;
+  --color-background: #fff8f5;
+  --color-on-background: #1e1b18;
+  --color-surface-variant: #e9e1dc;
+
+  /* Colores de papel del lector (no expuestos como clases utilitarias,
+     se aplican por data-atributo desde el motor del lector) */
+  --paper-ivory: #faf6ee;
+  --paper-cream: #f4ebe1;
+  --paper-white: #ffffff;
+  --paper-night: #23201d;
+
+  /* ── Tipografía ───────────────────────────────────────────── */
+  --font-reading: 'EB Garamond Variable', 'EB Garamond', Georgia, serif;
+  --font-handwriting: 'Dancing Script', cursive;
+  --font-ui: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  --text-display-lg: 48px;
+  --text-display-lg--line-height: 56px;
+  --text-display-lg--letter-spacing: -0.01em;
+  --text-display-lg--font-weight: 400;
+  --text-display-lg-mobile: 36px;
+  --text-display-lg-mobile--line-height: 44px;
+  --text-display-lg-mobile--letter-spacing: -0.01em;
+  --text-display-lg-mobile--font-weight: 400;
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 40px;
+  --text-headline-lg--letter-spacing: -0.005em;
+  --text-headline-lg--font-weight: 500;
+  --text-headline-lg-mobile: 26px;
+  --text-headline-lg-mobile--line-height: 34px;
+  --text-headline-lg-mobile--font-weight: 500;
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 32px;
+  --text-headline-md--font-weight: 500;
+  --text-headline-sm: 20px;
+  --text-headline-sm--line-height: 28px;
+  --text-headline-sm--font-weight: 600;
+  --text-reading-lg: 21px;
+  --text-reading-lg--line-height: 34px;
+  --text-reading-lg--font-weight: 400;
+  --text-reading-base: 18px;
+  --text-reading-base--line-height: 30px;
+  --text-reading-base--font-weight: 400;
+  --text-body-base: 15px;
+  --text-body-base--line-height: 24px;
+  --text-body-base--font-weight: 400;
+  --text-body-sm: 13px;
+  --text-body-sm--line-height: 20px;
+  --text-body-sm--font-weight: 400;
+  --text-label-md: 12px;
+  --text-label-md--line-height: 16px;
+  --text-label-md--letter-spacing: 0.04em;
+  --text-label-md--font-weight: 600;
+  --text-label-sm: 11px;
+  --text-label-sm--line-height: 14px;
+  --text-label-sm--letter-spacing: 0.06em;
+  --text-label-sm--font-weight: 500;
+
+  /* ── Espaciado y radios ───────────────────────────────────── */
+  --spacing-gutter: 1.5rem;
+  --spacing-gutter-mobile: 1rem;
+  --spacing-margin: 3rem;
+  --spacing-margin-mobile: 1.25rem;
+  --spacing-space-xs: 0.25rem;
+  --spacing-space-sm: 0.5rem;
+  --spacing-space-md: 1rem;
+  --spacing-space-lg: 1.5rem;
+  --spacing-space-xl: 2.5rem;
+
+  --radius-sm: 0.125rem;
+  --radius-DEFAULT: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+}
+
+/* ═══ Base ══════════════════════════════════════════════════ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100dvh;
+    overscroll-behavior: none;
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    font-family: var(--font-ui);
+    font-size: var(--text-body-base);
+    line-height: var(--text-body-base--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  main > :first-child {
+    margin-top: 0 !important;
+  }
+  main > :last-child {
+    margin-bottom: 0 !important;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Accesibilidad: focus visible nítido (sin halo azul agresivo) */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* ═══ Utilidades del design system ═════════════════════════ */
+@layer components {
+  /* Línea divisora Deckle con ornamento central */
+  .deckle-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: color-mix(in srgb, var(--color-outline) 40%, transparent);
+  }
+  .deckle-divider::before,
+  .deckle-divider::after {
+    content: '';
+    height: 1px;
+    width: 2rem;
+    background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  }
+
+  /* Iconos Material Symbols (self-hosted, ligaduras) */
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+  }
+
+  /* Chip de estado / género */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-DEFAULT);
+    background: var(--color-surface-container);
+    border: 1px solid color-mix(in srgb, var(--color-on-surface) 8%, transparent);
+    font-size: var(--text-label-sm);
+    font-weight: 500;
+    letter-spacing: var(--text-label-sm--letter-spacing);
+    text-transform: uppercase;
+  }
+}
+
+/* ═══ Motor flipbook: animaciones 3D ═══════════════════════ */
+@layer utilities {
+  .perspective-book {
+    perspective: 1600px;
+    perspective-origin: center center;
+  }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .page-turn-fwd {
+    animation: realistic-flip-forward 0.85s cubic-bezier(0.25, 0.9, 0.35, 1) forwards;
+  }
+  .page-turn-bwd {
+    animation: realistic-flip-backward 0.85s cubic-bezier(0.25, 0.9, 0.35, 1) forwards;
+  }
+
+  @media (min-width: 1024px) {
+    .page-turn-fwd, .page-turn-bwd {
+      transform-origin: center center !important;
+    }
+  }
+
+  @keyframes realistic-flip-forward {
+    0% {
+      transform: rotateY(0deg);
+      filter: drop-shadow(0 4px 12px rgba(43, 39, 36, 0.1));
+    }
+    35% {
+      transform: rotateY(-65deg) skewY(-2deg) scale(0.985);
+      filter: drop-shadow(-18px 16px 28px rgba(43, 39, 36, 0.22));
+    }
+    65% {
+      transform: rotateY(-125deg) skewY(1.5deg) scale(0.985);
+      filter: drop-shadow(-12px 14px 20px rgba(43, 39, 36, 0.18));
+    }
+    100% {
+      transform: rotateY(-180deg);
+      filter: drop-shadow(0 4px 12px rgba(43, 39, 36, 0.06));
+    }
+  }
+
+  @keyframes realistic-flip-backward {
+    0% {
+      transform: rotateY(-180deg);
+      filter: drop-shadow(0 4px 12px rgba(43, 39, 36, 0.06));
+    }
+    35% {
+      transform: rotateY(-125deg) skewY(1.5deg) scale(0.985);
+      filter: drop-shadow(-12px 14px 20px rgba(43, 39, 36, 0.18));
+    }
+    65% {
+      transform: rotateY(-65deg) skewY(-2deg) scale(0.985);
+      filter: drop-shadow(-18px 16px 28px rgba(43, 39, 36, 0.22));
+    }
+    100% {
+      transform: rotateY(0deg);
+      filter: drop-shadow(0 4px 12px rgba(43, 39, 36, 0.1));
+    }
+  }
+
+  /* Grano de papel archivado */
+  .paper-grain {
+    background-image: radial-gradient(#88726d 0.6px, transparent 0.6px);
+    background-size: 16px 16px;
+    opacity: 0.15;
+  }
+
+  /* Crema del lomo (lado izquierdo) */
+  .spine-crease {
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.03) 40%, transparent);
+  }
+
+  /* Respeto usuarios con movimiento reducido */
+  @media (prefers-reduced-motion: reduce) {
+    .page-turn-fwd,
+    .page-turn-bwd {
+      animation: page-fade 0.35s ease forwards;
+    }
+    .animate-pulse {
+      animation: none;
+    }
+    * {
+      scroll-behavior: auto !important;
+    }
+  }
+
+  @keyframes page-fade {
+    from {
+      opacity: 0.35;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

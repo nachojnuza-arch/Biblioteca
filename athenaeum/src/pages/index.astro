@@ -1,0 +1,338 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BookCard from '@/components/BookCard.astro';
+import { getPublishedBooks, getGenreStats } from '@/lib/books';
+import quotes from '@/data/quotes.json';
+
+const books = await getPublishedBooks();
+const genres = getGenreStats(books);
+
+const totalChapters = books.reduce((sum, b) => sum + b.chapters.length, 0);
+const totalWords = books.reduce(
+  (sum, b) => sum + b.chapters.reduce((s, ch) => s + ch.html.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length, 0),
+  0,
+);
+
+// Pensamiento del día: rotativo según la fecha (determinista por día).
+const dayIndex = Math.floor(Date.now() / 86_400_000);
+const quote = quotes[dayIndex % quotes.length]!;
+
+const shelfInit = JSON.stringify({
+  books: books.map((b) => ({ slug: b.slug, title: b.data.title, author: b.data.author, genre: b.data.genre })),
+}).replace(/</g, '\\u003c');
+---
+
+<BaseLayout
+  title="Estantería"
+  description={`Biblioteca de autor con ${books.length} escritos publicados: relatos, poemas y ensayos de edición privada, con lector inmersivo de efecto hoja.`}
+>
+  <!-- Hero / Portada (Pantalla Completa) -->
+  <section class="relative w-full h-[calc(100svh-4rem)] overflow-hidden mb-12 flex flex-col justify-end">
+    <img 
+      src="/hero.jpg" 
+      alt="Escritorio clásico de escritor, con máquina de escribir, café y manuscritos" 
+      class="absolute inset-0 w-full h-full object-cover object-center" 
+    />
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-surface/30 to-surface"></div>
+    
+    <div class="relative z-10 px-6 md:px-12 pb-16 max-w-5xl mx-auto w-full">
+      <h1 class="font-reading text-[2.5rem] md:text-[3.5rem] italic leading-[1.1] text-on-surface tracking-wide mb-4 drop-shadow-sm">
+        Biblioteca <br/><span class="text-[1.5rem] md:text-[2.25rem] text-primary/80">de R.H.Nuza</span>
+      </h1>
+      
+      <div class="w-full max-w-3xl mx-auto drop-shadow-sm mt-4 lg:mt-8">
+        <svg height="100%" style="background: transparent; overflow: visible;" viewBox="0 0 960 480" width="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter height="180%" id="quillShadow" width="180%" x="-40%" y="-40%">
+              <feDropShadow dx="6" dy="12" flood-color="#2a1a14" flood-opacity="0.25" stdDeviation="7"></feDropShadow>
+            </filter>
+            <filter height="120%" id="inkTexture" width="120%" x="-10%" y="-10%">
+              <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="0.4"></feGaussianBlur>
+              <feMerge>
+                <feMergeNode in="blur"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+              </feMerge>
+            </filter>
+            <linearGradient id="goldNibGrad" x1="0%" x2="100%" y1="0%" y2="100%">
+              <stop offset="0%" stop-color="#fae29c"></stop>
+              <stop offset="35%" stop-color="#d4a338"></stop>
+              <stop offset="75%" stop-color="#936214"></stop>
+              <stop offset="100%" stop-color="#543706"></stop>
+            </linearGradient>
+            <linearGradient id="quillFeatherGrad" x1="10%" x2="90%" y1="0%" y2="100%">
+              <stop offset="0%" stop-color="#fff8f5"></stop>
+              <stop offset="30%" stop-color="#e2d2c5"></stop>
+              <stop offset="65%" stop-color="#913d28"></stop>
+              <stop offset="100%" stop-color="#46160d"></stop>
+            </linearGradient>
+            <linearGradient id="shaftGrad" x1="0%" x2="0%" y1="0%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff"></stop>
+              <stop offset="50%" stop-color="#d5c1b1"></stop>
+              <stop offset="100%" stop-color="#735445"></stop>
+            </linearGradient>
+            <mask height="480" id="writingMask" maskUnits="userSpaceOnUse" width="960" x="0" y="0">
+              <rect fill="black" height="480" width="960" x="0" y="0"></rect>
+              <rect class="mask-reveal-l1" fill="white" height="90" width="0" x="110" y="110"></rect>
+              <rect class="mask-reveal-l2" fill="white" height="90" width="0" x="130" y="195"></rect>
+              <rect class="mask-reveal-sig" fill="white" height="85" width="0" x="510" y="275"></rect>
+            </mask>
+            <style>
+              .mask-reveal-l1 { animation: maskAnimL1 12s linear infinite; }
+              .mask-reveal-l2 { animation: maskAnimL2 12s linear infinite; }
+              .mask-reveal-sig { animation: maskAnimSig 12s linear infinite; }
+              .quill-motion { animation: quillPath 12s linear infinite; transform-origin: 0px 0px; }
+              .quill-micro-vibe { animation: microVibe 0.22s ease-in-out infinite alternate; transform-origin: 0px 0px; }
+              .ink-drop-1 { animation: popDrop1 12s ease infinite; transform-origin: 535px 165px; }
+              .ink-drop-2 { animation: popDrop2 12s ease infinite; transform-origin: 755px 250px; }
+              .text-wrapper-fade { animation: textFadeCycle 12s ease infinite; }
+
+              @keyframes textFadeCycle { 0%, 93% { opacity: 1; } 96% { opacity: 0; } 100% { opacity: 0; } }
+              @keyframes maskAnimL1 { 0%, 3% { width: 0px; } 40% { width: 760px; } 94% { width: 760px; } 98%, 100% { width: 0px; } }
+              @keyframes maskAnimL2 { 0%, 42% { width: 0px; } 73% { width: 740px; } 94% { width: 740px; } 98%, 100% { width: 0px; } }
+              @keyframes maskAnimSig { 0%, 75% { width: 0px; } 87% { width: 370px; } 94% { width: 370px; } 98%, 100% { width: 0px; } }
+
+              @keyframes quillPath {
+                0% { transform: translate(90px, 120px) scale(0.9); opacity: 0; }
+                3% { transform: translate(120px, 168px) scale(1); opacity: 1; }
+                10% { transform: translate(250px, 166px); }
+                17% { transform: translate(380px, 170px); }
+                25% { transform: translate(520px, 165px); }
+                32% { transform: translate(670px, 169px); }
+                40% { transform: translate(845px, 167px); }
+                41.5% { transform: translate(400px, 200px) scale(1.03); }
+                43%   { transform: translate(140px, 252px) scale(1); }
+                49% { transform: translate(270px, 250px); }
+                56% { transform: translate(430px, 254px); }
+                63% { transform: translate(590px, 249px); }
+                70% { transform: translate(740px, 253px); }
+                73% { transform: translate(840px, 251px); }
+                74.5% { transform: translate(660px, 300px) scale(1.02); }
+                76%   { transform: translate(525px, 342px) scale(1); }
+                79% { transform: translate(600px, 340px); }
+                83% { transform: translate(710px, 345px); }
+                87% { transform: translate(845px, 342px); }
+                89% { transform: translate(865px, 330px) scale(1.04); opacity: 1; }
+                94% { transform: translate(875px, 310px) scale(1); opacity: 0.8; }
+                97% { transform: translate(900px, 270px) scale(0.9); opacity: 0; }
+                100% { transform: translate(90px, 120px) scale(0.9); opacity: 0; }
+              }
+
+              @keyframes microVibe { 0% { transform: rotate(0deg) translate(0px, 0px); } 100% { transform: rotate(-2.4deg) translate(-1.2px, -1.5px); } }
+              @keyframes popDrop1 { 0%, 24% { transform: scale(0); opacity: 0; } 25% { transform: scale(1.3); opacity: 0.9; } 27% { transform: scale(1); opacity: 0.8; } 93% { opacity: 0.8; transform: scale(1); } 96%, 100% { opacity: 0; transform: scale(0); } }
+              @keyframes popDrop2 { 0%, 62% { transform: scale(0); opacity: 0; } 63% { transform: scale(1.3); opacity: 0.9; } 65% { transform: scale(1); opacity: 0.8; } 93% { opacity: 0.8; transform: scale(1); } 96%, 100% { opacity: 0; transform: scale(0); } }
+            </style>
+          </defs>
+
+          <g class="text-wrapper-fade" filter="url(#inkTexture)" mask="url(#writingMask)">
+            <text fill="#1e100a" font-family="'Dancing Script', 'EB Garamond', cursive, serif" font-size="44" font-weight="700" letter-spacing="0.5px" x="120" y="168">
+              «Mis textos no son ni buenos ni malos:
+            </text>
+            <text fill="#1e100a" font-family="'Dancing Script', 'EB Garamond', cursive, serif" font-size="44" font-weight="700" letter-spacing="0.5px" x="140" y="252">
+              son, como diría Borges, incorregibles»
+            </text>
+            <g>
+              <path d="M 525,340 C 555,322 585,350 620,332 C 655,314 685,346 725,330 C 755,318 780,340 805,332" fill="none" stroke="#7f301f" stroke-linecap="round" stroke-width="2.2"></path>
+              
+            </g>
+          </g>
+
+          <g class="quill-motion">
+            <g class="quill-micro-vibe" filter="url(#quillShadow)">
+              <g transform="translate(0, 0) rotate(43)">
+                <path d="M 0,0 C 2,-70 8,-175 22,-245" fill="none" stroke="url(#shaftGrad)" stroke-linecap="round" stroke-width="4.5"></path>
+                <path d="M 0,-14 C -22,-44 -46,-100 -40,-158 C -37,-178 -32,-194 -22,-210 C -26,-204 -31,-185 -29,-168 C -20,-198 -11,-220 5,-242 C 0,-205 -2,-130 0,-14 Z" fill="url(#quillFeatherGrad)" opacity="0.97"></path>
+                <path d="M 0,-14 C 17,-44 40,-98 35,-154 C 33,-174 27,-190 17,-205 C 21,-198 25,-180 23,-165 C 16,-195 10,-220 7,-244 C 4,-195 2,-122 0,-14 Z" fill="url(#quillFeatherGrad)" opacity="0.92"></path>
+                <g opacity="0.35" stroke="#ffffff" stroke-linecap="round" stroke-width="0.65">
+                  <line x1="-3" x2="-28" y1="-48" y2="-74"></line>
+                  <line x1="-3" x2="-36" y1="-78" y2="-110"></line>
+                  <line x1="-4" x2="-33" y1="-110" y2="-146"></line>
+                  <line x1="-5" x2="-29" y1="-142" y2="-182"></line>
+                  <line x1="3" x2="25" y1="-48" y2="-72"></line>
+                  <line x1="3" x2="31" y1="-78" y2="-107"></line>
+                  <line x1="4" x2="27" y1="-110" y2="-142"></line>
+                </g>
+                <path d="M 0.6,-8 C 2.6,-68 7.8,-165 19,-240" fill="none" opacity="0.6" stroke="#ffffff" stroke-width="1.2"></path>
+              </g>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contenido de la Estantería -->
+  <div class="flex flex-col gap-space-lg max-w-4xl mx-auto w-full px-gutter-mobile">
+
+    <!-- Búsqueda y Stats -->
+    <section>
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <p class="font-ui text-label-sm uppercase tracking-wider text-on-surface-variant">
+            {books.length} {books.length === 1 ? 'escrito' : 'escritos'} · 
+            {totalChapters} {totalChapters === 1 ? 'capítulo' : 'capítulos'} ·
+            {totalWords.toLocaleString('es-AR')} palabras
+          </p>
+        </div>
+        
+        <div
+          class="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-surface-container-low border border-outline-variant/40 focus-within:border-primary transition-colors min-w-[280px]"
+        >
+          <span class="material-symbols-outlined text-[19px] text-outline" aria-hidden="true"
+            >search</span
+          >
+          <input
+            type="search"
+            id="shelf-search"
+            class="w-full bg-transparent outline-none font-ui text-body-sm text-on-surface placeholder:text-on-surface-variant/60"
+            placeholder="Buscar manuscrito, autor o género…"
+            aria-label="Buscar en la estantería"
+          />
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div
+        class="mt-3 flex items-center gap-2 overflow-x-auto pb-1"
+        id="shelf-filters"
+        role="group"
+        aria-label="Filtrar por género"
+      >
+        <button
+          class="chip shrink-0 transition-colors bg-surface-container-highest text-primary"
+          data-genre-filter="todos"
+          aria-pressed="true"
+          type="button"
+        >
+          Todos ({books.length})
+        </button>
+        {
+          genres.map((g) => (
+            <button
+              class="chip shrink-0 transition-colors hover:bg-surface-container-high"
+              data-genre-filter={g.genre}
+              aria-pressed="false"
+              type="button"
+            >
+              {g.genre} ({g.count})
+            </button>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Lectura en curso (oculta hasta detectar progreso guardado) -->
+    <section class="px-gutter-mobile hidden" id="reading-hero" aria-label="Lectura en curso">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="font-ui text-label-md uppercase tracking-wider text-on-surface-variant">
+          En curso de lectura
+        </h2>
+        <a
+          href="/cuaderno"
+          class="font-ui text-label-sm uppercase tracking-wider text-primary hover:text-tertiary transition-colors"
+          >Historial</a
+        >
+      </div>
+      <div
+        class="relative p-4 rounded-lg bg-surface-container-low border border-outline-variant/30 shadow-[0_1px_3px_rgba(43,39,36,0.04),0_4px_12px_rgba(43,39,36,0.03)] overflow-hidden"
+      >
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+        <div class="flex items-start justify-between gap-4">
+          <div class="min-w-0">
+            <span class="font-ui text-label-sm uppercase tracking-widest text-primary"
+              >Reanudar</span
+            >
+            <h3
+              class="font-reading text-headline-md text-on-surface leading-tight truncate"
+              data-hero-title
+            >
+            </h3>
+          </div>
+          <div class="text-right shrink-0">
+            <p class="font-ui text-label-sm font-semibold text-primary" data-hero-progress-label>
+              0% completado
+            </p>
+          </div>
+        </div>
+        <div
+          class="mt-3 h-1.5 rounded-full bg-surface-container-high overflow-hidden"
+          role="progressbar"
+          aria-label="Progreso del libro en curso"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
+          <div
+            class="h-full bg-primary rounded-full transition-all duration-500"
+            data-hero-progress-fill
+            style="width: 0%;"
+          >
+          </div>
+        </div>
+        <a
+          href="/lectura"
+          data-hero-resume
+          class="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-on-primary font-ui text-label-md uppercase tracking-wider shadow-md hover:bg-primary-container transition-colors"
+        >
+          <span class="material-symbols-outlined text-[17px]" aria-hidden="true">bookmark</span>
+          Reanudar lectura
+        </a>
+      </div>
+    </section>
+
+    <!-- Estantería -->
+    <section class="px-gutter-mobile" aria-label="Manuscritos en estante">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-reading text-headline-lg text-on-surface">Manuscritos en Estante</h2>
+      </div>
+      <div
+        class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-gutter-mobile"
+        id="shelf-grid"
+      >
+        {books.map((book) => <BookCard book={book} />)}
+      </div>
+      <p
+        class="hidden mt-6 text-center font-reading text-reading-base italic text-on-surface-variant"
+        id="shelf-empty"
+        hidden
+      >
+        No hay manuscritos que coincidan con la búsqueda.
+      </p>
+    </section>
+
+    <!-- Pensamiento del día -->
+    <section class="px-gutter-mobile" aria-label="Pensamiento del día">
+      <div
+        class="p-5 rounded-lg bg-surface-container-low border border-outline-variant/25 relative overflow-hidden"
+      >
+        <span class="font-ui text-label-sm uppercase tracking-[0.2em] text-outline">
+          Pensamiento del día
+        </span>
+        <blockquote class="mt-2 font-reading text-reading-lg text-on-surface leading-relaxed">
+          «{quote.text}»
+        </blockquote>
+        <div class="mt-3 flex items-center justify-between">
+          <cite class="font-ui text-label-sm uppercase tracking-wider text-on-surface-variant not-italic">
+            {quote.author}
+          </cite>
+          <a
+            href="/cuaderno"
+            class="font-ui text-label-sm uppercase tracking-wider text-primary hover:text-tertiary transition-colors"
+          >
+            Anotar en Cuaderno
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script id="shelf-init-data" type="application/json" set:html={shelfInit}></script>
+  <script>
+    import { bootShelf } from '@/lib/shelf/shelf-app';
+    const dataEl = document.getElementById('shelf-init-data');
+    if (dataEl) {
+      bootShelf(JSON.parse(dataEl.textContent));
+    }
+  </script>
+
+  
+</BaseLayout>
+

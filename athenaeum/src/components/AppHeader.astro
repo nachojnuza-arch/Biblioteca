@@ -1,0 +1,35 @@
+---
+import AthenaeumLogo from '@/components/AthenaeumLogo.astro';
+
+interface Props {
+  subtitle?: string;
+}
+const { subtitle } = Astro.props;
+---
+
+<header
+  class="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"
+>
+  <div class="h-16 px-gutter-mobile flex items-center justify-between max-w-4xl mx-auto">
+    <a href="/" class="flex items-center gap-space-sm" aria-label="Athenaeum — Inicio">
+      <AthenaeumLogo class="h-8 w-8" />
+      <span class="flex flex-col leading-none">
+        <span class="font-ui text-label-sm uppercase text-on-surface-variant tracking-widest">
+          Athenaeum
+        </span>
+        <span class="font-reading text-headline-sm text-on-surface leading-tight">
+          {subtitle ?? 'Biblioteca de R.H.Nuza'}
+        </span>
+      </span>
+    </a>
+    <div class="flex items-center gap-space-sm">
+      <a
+        href="/cuaderno"
+        class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-surface-container-high transition-colors shadow-sm"
+        aria-label="Mis notas y cuaderno"
+      >
+        <span class="material-symbols-outlined text-[18px]" aria-hidden="true">person</span>
+      </a>
+    </div>
+  </div>
+</header>

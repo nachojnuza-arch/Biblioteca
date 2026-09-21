@@ -1,0 +1,201 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BookCover from '@/components/BookCover.astro';
+import { getPublishedBooks } from '@/lib/books';
+
+export async function getStaticPaths() {
+  const books = await getPublishedBooks();
+  return books.map((book) => ({
+    params: { slug: book.slug },
+    props: { book },
+  }));
+}
+
+const { book } = Astro.props;
+
+const readingTime = `${Math.floor(book.readingMinutes / 60)}h ${book.readingMinutes % 60}m`;
+const lastRevision = new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short' }).format(
+  new Date(),
+);
+---
+
+<BaseLayout
+  title={book.data.title}
+  description={`${book.data.title}, ${book.data.subtitle} — ${book.data.synopsis.slice(0, 140)}…`}
+>
+  <div class="flex flex-col gap-space-md max-w-3xl mx-auto w-full">
+    <!-- Portada + títulos -->
+    <section class="px-gutter-mobile pt-space-sm flex flex-col items-center gap-4">
+      <div class="w-40 md:w-48">
+        <BookCover
+          title={book.data.title}
+          subtitle={book.data.subtitle}
+          author={book.data.author}
+          palette={book.data.coverPalette}
+        />
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-2">
+        <span class="chip bg-secondary-fixed/60 text-secondary border-secondary/20">
+          Ficción · Edición privada
+        </span>
+        <span class="chip">{book.data.genre}</span>
+      </div>
+
+      <div class="text-center">
+        <h1 class="font-reading text-display-lg-mobile md:text-display-lg text-on-surface tracking-tight">
+          {book.data.title}
+        </h1>
+        <p class="font-ui text-body-base text-on-surface-variant mt-1">
+          {book.data.author} · {book.data.year}
+        </p>
+      </div>
+    </section>
+
+    <!-- Metadatos -->
+    <section class="px-gutter-mobile" aria-label="Metadatos de la obra">
+      <div
+        class="grid grid-cols-4 gap-2 p-4 rounded-lg bg-surface-container-low border border-outline-variant/25"
+      >
+        <div class="flex flex-col items-center gap-1 text-center">
+          <span class="material-symbols-outlined text-[20px] text-primary" aria-hidden="true"
+            >auto_stories</span
+          >
+          <span class="font-reading text-body-base text-on-surface leading-none"
+            >~{book.estimatedPages} págs</span
+          >
+          <span class="font-ui text-label-sm uppercase tracking-wider text-outline">Volumen</span>
+        </div>
+        <div class="flex flex-col items-center gap-1 text-center">
+          <span class="material-symbols-outlined text-[20px] text-primary" aria-hidden="true"
+            >schedule</span
+          >
+          <span class="font-reading text-body-base text-on-surface leading-none"
+            >{readingTime}</span
+          >
+          <span class="font-ui text-label-sm uppercase tracking-wider text-outline">Lectura</span>
+        </div>
+        <div class="flex flex-col items-center gap-1 text-center">
+          <span class="material-symbols-outlined text-[20px] text-primary" aria-hidden="true"
+            >event</span
+          >
+          <span class="font-reading text-body-base text-on-surface leading-none"
+            >{lastRevision}</span
+          >
+          <span class="font-ui text-label-sm uppercase tracking-wider text-outline">Revisión</span>
+        </div>
+        <div class="flex flex-col items-center gap-1 text-center">
+          <span class="material-symbols-outlined text-[20px] text-primary" aria-hidden="true"
+            >description</span
+          >
+          <span class="font-reading text-body-base text-on-surface leading-none">Texto</span>
+          <span class="font-ui text-label-sm uppercase tracking-wider text-outline">Formato</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Acciones -->
+    <section class="px-gutter-mobile flex flex-col gap-2" aria-label="Acciones de lectura">
+      <a
+        href={`/leer/${book.slug}`}
+        class="w-full py-3 rounded-lg bg-primary text-on-primary font-ui text-label-md uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:bg-primary-container transition-colors"
+      >
+        <span class="material-symbols-outlined text-[19px]" aria-hidden="true"
+          >auto_stories</span
+        >
+        Leer
+      </a>
+      <div class="grid grid-cols-2 gap-2">
+        <a
+          href={`/libro/${book.slug}#indice`}
+          class="py-2.5 rounded-lg bg-surface-container border border-outline-variant/40 font-ui text-label-md uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-surface-container-high transition-colors"
+        >
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true"
+            >format_list_bulleted</span
+          >
+          Índice
+        </a>
+        <a
+          href="/cuaderno"
+          class="py-2.5 rounded-lg bg-surface-container border border-outline-variant/40 font-ui text-label-md uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-surface-container-high transition-colors"
+        >
+          <span class="material-symbols-outlined text-[18px]" aria-hidden="true">ink_pen</span>
+          Notas
+        </a>
+      </div>
+    </section>
+
+    <!-- Prólogo -->
+    {
+      book.data.prologueQuote && (
+        <section class="px-gutter-mobile" aria-label="Prólogo del autor">
+          <div class="p-4 rounded-lg bg-surface-container-low border-l-4 border-primary">
+            <span class="font-ui text-label-sm uppercase tracking-[0.2em] text-outline">
+              Prólogo del Autor
+            </span>
+            <blockquote class="mt-2 font-reading text-reading-base italic text-on-surface leading-relaxed">
+              «{book.data.prologueQuote}»
+            </blockquote>
+            <cite class="mt-2 block font-ui text-label-sm uppercase tracking-wider text-on-surface-variant not-italic">
+              {book.data.prologueAttribution}
+            </cite>
+          </div>
+        </section>
+      )
+    }
+
+    <!-- Sinopsis -->
+    <section class="px-gutter-mobile" aria-label="Sinopsis">
+      <div class="p-4 rounded-lg bg-surface-container-lowest border border-outline-variant/25">
+        <h2 class="font-reading text-headline-md text-on-surface mb-2">Argumento de la Obra</h2>
+        <p class="font-reading text-reading-base text-on-surface-variant leading-relaxed">
+          {book.data.synopsis}
+        </p>
+        <div class="flex flex-wrap gap-2 mt-3">
+          {
+            book.data.tags.map((tag) => (
+              <span class="chip bg-secondary-fixed/50 text-secondary border-secondary/20">{tag}</span>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Índice -->
+    <section class="px-gutter-mobile" id="indice" aria-label="Índice de capítulos">
+      <div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant/25">
+        <h2 class="font-reading text-headline-md text-on-surface mb-3">Índice</h2>
+        <ol class="flex flex-col">
+          {
+            book.chapters.map((ch, i) => (
+              <li>
+                <a
+                  href={`/leer/${book.slug}`}
+                  class="flex items-baseline justify-between gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-container transition-colors group"
+                >
+                  <span class="font-reading text-reading-base text-on-surface group-hover:text-primary transition-colors">
+                    {ch.data.number}. {ch.data.title}
+                  </span>
+                  <span class="font-ui text-label-sm uppercase text-outline shrink-0">
+                    {ch.data.location}
+                  </span>
+                </a>
+                {i < book.chapters.length - 1 && <div class="h-px bg-outline-variant/25 mx-3" />}
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+
+    <!-- Pie de signatura -->
+    <footer class="px-gutter-mobile pb-space-md text-center">
+      <p class="font-ui text-label-sm uppercase tracking-[0.2em] text-outline">
+        {book.data.signature}
+      </p>
+      <p class="font-ui text-label-sm uppercase tracking-[0.2em] text-outline mt-1">
+        Custodiado en el archivo personal del lector
+      </p>
+    </footer>
+  </div>
+</BaseLayout>

@@ -1,0 +1,302 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getPublishedBooks } from '@/lib/books';
+
+const books = await getPublishedBooks();
+
+const adminInit = {
+  books: books.map((b) => ({
+    slug: b.slug,
+    title: b.data.title,
+    author: b.data.author,
+    genre: b.data.genre,
+    status: b.data.status,
+    order: b.data.order,
+    chapters: b.chapters.length,
+    estimatedPages: b.estimatedPages,
+    readingMinutes: b.readingMinutes,
+    coverPalette: b.data.coverPalette,
+    tags: b.data.tags,
+  })),
+  stats: {
+    totalBooks: books.length,
+    publishedBooks: books.filter((b) => b.data.status === 'published').length,
+    draftBooks: books.filter((b) => b.data.status === 'draft').length,
+    totalChapters: books.reduce((s, b) => s + b.chapters.length, 0),
+    totalWords: books.reduce((s, b) => s + b.estimatedPages * 350, 0),
+  },
+};
+
+const initJson = JSON.stringify(adminInit).replace(/</g, '\\u003c');
+---
+
+<script is:inline>
+  const p = prompt("Contraseña de acceso al panel de administración:");
+  if (p !== "nuza") {
+    window.location.href = "/";
+  }
+</script>
+
+<BaseLayout
+  title="Administrador"
+  description="Gestioná tus escritos, publicaciones y orden de la biblioteca."
+  hideNav={false}
+  activePath="settings"
+>
+  <div class="flex flex-col gap-space-lg max-w-5xl mx-auto w-full">
+    <!-- Encabezado -->
+    <section class="px-gutter-mobile pt-space-sm">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-[28px] text-primary" aria-hidden="true">admin_panel_settings</span>
+        <div>
+          <h1 class="font-reading text-display-lg-mobile md:text-display-lg text-on-surface tracking-tight">
+            Administrador
+          </h1>
+          <p class="font-ui text-body-base text-on-surface-variant mt-0.5">
+            Gestioná tu biblioteca: publica, ordena y organiza tus escritos.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="px-gutter-mobile" aria-label="Estadísticas">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3" id="admin-stats"></div>
+    </section>
+
+    <!-- Filtros y búsqueda -->
+    <section class="px-gutter-mobile flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-center gap-2 flex-1">
+        <span class="material-symbols-outlined text-[19px] text-outline" aria-hidden="true">search</span>
+        <input
+          type="search"
+          id="admin-search"
+          class="w-full sm:w-64 px-3 py-2.5 rounded-lg bg-surface-container-low border border-outline-variant/40 focus:border-primary outline-none font-ui text-body-sm text-on-surface placeholder:text-on-surface-variant/60"
+          placeholder="Buscar escrito, autor o género…"
+          aria-label="Buscar escritos"
+        />
+      </div>
+      <div class="flex items-center gap-2">
+        <label for="admin-genre-filter" class="font-ui text-label-sm uppercase tracking-wider text-on-surface-variant">Filtrar:</label>
+        <select
+          id="admin-genre-filter"
+          class="px-3 py-2.5 rounded-lg bg-surface-container-low border border-outline-variant/40 focus:border-primary outline-none font-ui text-body-sm text-on-surface"
+        >
+          <option value="todos">Todos</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Botón importar -->
+    <section class="px-gutter-mobile">
+      <div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <p class="font-ui text-label-sm uppercase tracking-wider text-primary font-semibold">Importar nuevo escrito</p>
+          <p class="font-ui text-body-sm text-on-surface-variant mt-0.5">Subí un archivo Word (.docx) o EPUB para agregarlo a la biblioteca.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <a
+            href="https://docs.google.com/document/d/1"
+            target="_blank"
+            rel="noopener"
+            class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-ui text-label-sm uppercase tracking-wider hover:bg-secondary-fixed transition-colors"
+          >
+            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">upload_file</span>
+            Instrucciones de importación
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Formulario de añadir + Carga de archivos -->
+    <section class="px-gutter-mobile flex flex-col gap-4">
+      <details class="group">
+        <summary class="flex items-center gap-2 cursor-pointer font-ui text-label-md uppercase tracking-wider text-primary hover:text-tertiary transition-colors list-none">
+          <span class="material-symbols-outlined text-[20px] group-open:rotate-90 transition-transform" aria-hidden="true">add</span>
+          Agregar nuevo escrito
+        </summary>
+        <form id="admin-add-form" class="mt-3 p-4 rounded-lg bg-surface-container-low border border-outline-variant/25 flex flex-col gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="flex flex-col gap-1">
+              <label class="font-ui text-label-sm uppercase tracking-wider text-on-surface-variant" for="add-title">Título *</label>
+              <input name="title" id="add-title" required maxlength="120" class="px-3 py-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant/40 focus:border-primary outline-none font-ui text-body-sm text-on-surface" placeholder="Mi Nuevo Libro" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="font-ui text-label-sm uppercase tracking-wider text-on-surface-variant" for="add-author">Autor *</label>
+              <input name="author" id="add-author" required maxlength="100" class="px-3 py-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant/40 focus:border-primary outline-none font-ui text-body-sm text-on-surface" placeholder="Tu Nombre" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="flex flex-col gap-1">
+              <label class="font-ui text-label-sm uppercase tracking-wider text-on-surface-variant" for="add-genre">Género *</label>
+              <input name="genre" id="add-genre" required maxlength="50" class="px-3 py-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant/40 focus:border-primary outline-none font-ui text-body-sm text-on-surface" placeholder="Novela" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="font-ui text-label-sm uppercase tracking-wider text-on-surface-variant" for="add-palette">Color de portada</label>
+              <select name="coverPalette" id="add-palette" class="px-3 py-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant/40 focus:border-primary outline-none font-ui text-body-sm text-on-surface">
+                <option value="terracotta">Terracota</option>
+                <option value="olive">Oliva</option>
+                <option value="burgundy">Borgoña</option>
+                <option value="ivory">Marfil</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="font-ui text-label-sm uppercase tracking-wider text-on-surface-variant" for="add-tags">Tags (separados por coma)</label>
+              <input name="tags" id="add-tags" maxlength="200" class="px-3 py-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant/40 focus:border-primary outline-none font-ui text-body-sm text-on-surface" placeholder="Ficción, Inédito" />
+            </div>
+          </div>
+          <button type="submit" class="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-primary text-on-primary font-ui text-label-md uppercase tracking-wider shadow-md hover:bg-primary-container transition-colors self-start">
+            Crear Escrito
+          </button>
+        </form>
+      </details>
+
+      <!-- Carga de archivo -->
+      <div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant/25">
+        <p class="font-ui text-label-md uppercase tracking-wider text-primary mb-2">
+          Importar desde Word o EPUB
+        </p>
+        <p class="font-ui text-body-sm text-on-surface-variant mb-3">
+          Subí tu archivo .docx o .epub y se generará automáticamente el código del libro como un ZIP descargable.
+        </p>
+        <div
+          id="upload-area"
+          class="border-2 border-dashed border-outline-variant/40 rounded-lg p-6 text-center cursor-pointer hover:border-primary hover:bg-surface-container-high transition-colors"
+          role="button"
+          tabindex="0"
+          aria-label="Subir archivo Word o EPUB"
+        >
+          <span class="material-symbols-outlined text-[40px] text-outline/50" aria-hidden="true">upload_file</span>
+          <p class="font-ui text-body-sm text-on-surface-variant mt-1">
+            Arrastrá un archivo .docx o .epub aquí, o hacé clic para seleccionar
+          </p>
+          <input type="file" id="file-input" accept=".docx,.epub" class="hidden" />
+        </div>
+        <p id="upload-status" class="mt-2 font-ui text-body-sm"></p>
+      </div>
+
+      <!-- Carga por URL -->
+      <div class="p-4 rounded-lg bg-surface-container-low border border-outline-variant/25">
+        <p class="font-ui text-label-md uppercase tracking-wider text-primary mb-2">
+          O importar desde un enlace
+        </p>
+        <p class="font-ui text-body-sm text-on-surface-variant mb-3">
+          Pegá el enlace de un Google Docs (o un enlace directo .docx/.epub) y se generará el libro automáticamente.
+        </p>
+        <div class="flex gap-2">
+          <input
+            type="url"
+            id="url-input"
+            class="flex-1 px-3 py-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant/40 focus:border-primary outline-none font-ui text-body-sm text-on-surface placeholder:text-on-surface-variant/60"
+            placeholder="https://docs.google.com/document/d/..."
+            aria-label="Enlace del documento"
+          />
+          <button
+            id="btn-url-import"
+            class="px-4 py-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-ui text-label-sm uppercase tracking-wider hover:bg-secondary-fixed transition-colors whitespace-nowrap"
+            type="button"
+          >
+            Importar desde enlace
+          </button>
+        </div>
+        <p id="url-status" class="mt-2 font-ui text-body-sm"></p>
+      </div>
+    </section>
+
+    <!-- Grid de escritos -->
+    <section class="px-gutter-mobile pb-space-lg" aria-label="Escritos">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="admin-grid"></div>
+    </section>
+  </div>
+
+  <script id="admin-init-data" type="application/json" set:html={initJson}></script>
+  <script>
+    console.log("Admin v2 init");
+    import { bootAdmin } from '@/lib/admin/admin-app';
+    const initEl = document.getElementById('admin-init-data');
+    if (initEl && initEl.textContent) {
+      bootAdmin(JSON.parse(initEl.textContent));
+    }
+  </script>
+
+  <style>
+    .stat-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      background: var(--color-surface-container-low);
+      border: 1px solid color-mix(in srgb, var(--color-on-surface) 8%, transparent);
+    }
+    .stat-num {
+      font-family: var(--font-reading);
+      font-size: 2rem;
+      font-weight: 500;
+      color: var(--color-primary);
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: var(--font-ui);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-on-surface-variant);
+    }
+
+    .admin-card {
+      padding: 1.25rem;
+      border-radius: 0.75rem;
+      background: var(--color-surface-container-lowest);
+      border: 1px solid color-mix(in srgb, var(--color-on-surface) 8%, transparent);
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .admin-card:hover {
+      box-shadow: 0 4px 16px rgba(43, 39, 36, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .admin-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid color-mix(in srgb, var(--color-on-surface) 10%, transparent);
+      background: var(--color-surface-container);
+      color: var(--color-on-surface-variant);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .admin-btn:hover {
+      background: var(--color-surface-container-high);
+      color: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+    .admin-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .admin-btn-delete:hover {
+      background: var(--color-error-container);
+      color: var(--color-error);
+      border-color: var(--color-error);
+    }
+
+    .admin-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      grid-column: 1 / -1;
+      text-align: center;
+    }
+
+    details summary::-webkit-details-marker { display: none; }
+    details summary::marker { display: none; }
+  </style>
+</BaseLayout>

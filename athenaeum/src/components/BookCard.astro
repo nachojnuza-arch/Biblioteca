@@ -1,0 +1,43 @@
+---
+import BookCover from '@/components/BookCover.astro';
+import type { BookWithChapters } from '@/lib/books';
+
+interface Props {
+  book: BookWithChapters;
+}
+
+const { book } = Astro.props;
+---
+
+<article class="flex flex-col gap-2" data-book-slug={book.slug}>
+  <a
+    href={`/libro/${book.slug}`}
+    class="group block rounded-lg focus-within:ring-2 focus-within:ring-primary"
+    aria-label={`Ver ficha de ${book.data.title}, de ${book.data.author}`}
+  >
+    <BookCover
+      title={book.data.title}
+      subtitle={book.data.subtitle}
+      author={book.data.author}
+      palette={book.data.coverPalette}
+      class="transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-[2px_8px_20px_rgba(43,39,36,0.12)]"
+    />
+  </a>
+  <div class="flex flex-col gap-0.5 px-1">
+    <h3 class="font-reading text-headline-sm text-on-surface leading-tight truncate">
+      {book.data.title}
+    </h3>
+    <span class="font-ui text-body-sm text-on-surface-variant truncate">
+      {book.data.author}
+    </span>
+    <div class="flex items-center gap-1.5 mt-0.5">
+      <span class="chip text-secondary bg-secondary-fixed/60 border-secondary/20">
+        {book.data.genre}
+      </span>
+      <span class="font-ui text-label-sm uppercase tracking-wider text-outline">
+        {book.chapters.length}
+        {book.chapters.length === 1 ? 'cap.' : 'caps.'}
+      </span>
+    </div>
+  </div>
+</article>

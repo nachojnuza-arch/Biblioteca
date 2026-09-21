@@ -1,0 +1,35 @@
+---
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<!-- Monograma Athenaeum: libro abierto (versión SVG inline del logo,
+     sin dependencias de CDNs externos). -->
+<svg
+  viewBox="0 0 48 48"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  class={className}
+  role="img"
+  aria-label="Logotipo Athenaeum"
+>
+  <rect width="48" height="48" rx="8" fill="#9e4734"></rect>
+  <!-- Páginas del libro -->
+  <path
+    d="M9 13.5c4.5-2.4 9-2.4 13.5 0v21c-4.5-2.4-9-2.4-13.5 0v-21Z"
+    fill="#ffdad3"></path>
+  <path
+    d="M39 13.5c-4.5-2.4-9-2.4-13.5 0v21c4.5-2.4 9-2.4 13.5 0v-21Z"
+    fill="#ffdad3"></path>
+  <!-- Lomo -->
+  <rect x="22" y="12" width="4" height="24" rx="1" fill="#fff8f5"></rect>
+  <circle cx="24" cy="13.5" r="2.6" fill="#7f301f"></circle>
+  <!-- Líneas de texto estilizadas -->
+  <path
+    d="M12.5 19c2.8-1 5.6-1 8 0M12.5 24c2.8-1 5.6-1 8 0M12.5 29c2.8-1 5.6-1 8 0M27.5 19c2.4-1 5.2-1 8 0M27.5 24c2.4-1 5.2-1 8 0M27.5 29c2.4-1 5.2-1 8 0"
+    stroke="#9e4734"
+    stroke-width="1.6"
+    stroke-linecap="round"></path>
+</svg>

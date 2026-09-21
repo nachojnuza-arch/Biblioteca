@@ -1,0 +1,74 @@
+---
+import '@fontsource-variable/eb-garamond';
+import '@fontsource/dancing-script';
+import '@fontsource-variable/plus-jakarta-sans';
+import '@fontsource/material-symbols-outlined';
+import '@/styles/global.css';
+import AppHeader from '@/components/AppHeader.astro';
+import BottomNav from '@/components/BottomNav.astro';
+
+interface Props {
+  /** Título de la página (SEO + pestaña) */
+  title: string;
+  /** Descripción para motores de búsqueda */
+  description?: string;
+  /** Path activo de la navegación inferior */
+  activePath?: 'library' | 'reader' | 'notebook' | 'settings' | 'admin';
+  /** Ocultar barra superior y navegación (ideal para modo inmersivo) */
+  hideNav?: boolean;
+}
+
+const {
+  title,
+  description = 'Biblioteca digital personal: relatos, poemas y ensayos de edición privada con lector inmersivo de efecto hoja.',
+  activePath = 'library',
+  hideNav = false,
+} = Astro.props;
+
+const siteName = 'Athenaeum';
+const fullTitle = `${title} · ${siteName}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#fff8f5" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="es_AR" />
+
+    <!--
+      Seguridad: Content Security Policy.
+      - connect-src permite enlaces externos para carga de archivos (Google Docs, OneDrive, proxies CORS).
+      - script-src con 'unsafe-inline' necesario para scripts de carga de admin (Astro inyecta script modules).
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' ws://localhost:* http://localhost:*; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+  </head>
+  <body class="bg-surface text-on-surface flex flex-col antialiased min-h-dvh">
+    {!hideNav && <AppHeader />}
+    <main class={`flex flex-col relative w-full flex-1 ${hideNav ? '' : 'pt-16 pb-24'}`}>
+      <slot />
+    </main>
+    {!hideNav && <BottomNav activePath={activePath} />}
+  </body>
+</html>

@@ -1,0 +1,56 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Cuaderno"
+  description="Anotaciones y citas subrayadas de tus lecturas, guardadas en este dispositivo."
+  activePath="notebook"
+>
+  <div class="flex flex-col gap-space-md max-w-3xl mx-auto w-full">
+    <section class="px-gutter-mobile pt-space-sm">
+      <h1 class="font-reading text-display-lg-mobile md:text-display-lg text-on-surface tracking-tight">
+        Cuaderno de Notas
+      </h1>
+      <p class="font-ui text-body-base text-on-surface-variant mt-1">
+        Tus anotaciones al margen de cada lectura. Se guardan solo en este dispositivo;
+        ninguna sale de tu navegador.
+      </p>
+      <p class="mt-2 font-ui text-label-sm uppercase tracking-wider text-on-surface-variant">
+        <span id="notebook-count">0</span> anotaciones
+      </p>
+    </section>
+
+    <section class="px-gutter-mobile pb-space-md">
+      <div
+        id="notebook-empty"
+        class="p-8 rounded-lg bg-surface-container-low border border-dashed border-outline-variant/50 text-center"
+      >
+        <span
+          class="material-symbols-outlined text-[40px] text-outline/60"
+          aria-hidden="true">ink_pen</span
+        >
+        <h2 class="font-reading text-headline-md text-on-surface mt-2">
+          El cuaderno está en blanco
+        </h2>
+        <p class="font-ui text-body-sm text-on-surface-variant mt-1 max-w-sm mx-auto">
+          Al leer un libro, abrí el panel «Notas» y registrá citas, dudas o ideas al margen.
+        </p>
+        <a
+          href="/"
+          class="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-on-primary font-ui text-label-md uppercase tracking-wider shadow-md hover:bg-primary-container transition-colors"
+        >
+          <span class="material-symbols-outlined text-[17px]" aria-hidden="true">menu_book</span>
+          Ir a la estantería
+        </a>
+      </div>
+
+      <div class="flex flex-col gap-space-md" id="notebook-list" hidden></div>
+    </section>
+  </div>
+
+  <script>
+    import { bootNotebook } from '@/lib/notebook/notebook-app';
+    bootNotebook();
+  </script>
+</BaseLayout>
