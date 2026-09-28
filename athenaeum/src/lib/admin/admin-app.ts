@@ -172,7 +172,7 @@ export function bootAdmin(init: AdminInit): void {
   function saveBooks(): void {
     try { localStorage.setItem('athenaeum:admin-books', JSON.stringify(books)); } catch { /* storage lleno */ }
   }
-  function loadBooks(): AdminBook[] {
+  function loadBooks(): AdminBook[] { return [...init.books];
     try { const saved = localStorage.getItem('athenaeum:admin-books'); if (saved) return JSON.parse(saved); } catch { /* corrupto */ }
     return [...init.books];
   }
@@ -203,7 +203,7 @@ export function bootAdmin(init: AdminInit): void {
     modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4';
 
     const defaultTitle = bookData.rawTitle.replace(/^#+\s*/, '').trim() || 'Libro Sin Título';
-    const defaultAuthor = bookData.rawAuthor || '';
+    const defaultAuthor = bookData.rawAuthor || 'Ricardo Nuza';
     const defaultGenre = bookData.rawGenre || 'General';
 
     let chaptersHtml = bookData.chapters.map((ch, i) => `
@@ -236,7 +236,10 @@ export function bootAdmin(init: AdminInit): void {
           </div>
           <div>
             <label class="font-ui text-label-sm uppercase tracking-wider text-on-surface-variant block mb-1">Género</label>
-            <input type="text" id="modal-genre" class="w-full px-3 py-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant/40 focus:border-primary outline-none font-ui text-body-sm text-on-surface" value="${defaultGenre}" />
+            <select id="modal-genre" class="w-full px-3 py-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant/40 focus:border-primary outline-none font-ui text-body-sm text-on-surface">
+              <option value="General" ${defaultGenre !== 'Poesía' ? 'selected' : ''}>Relato / General</option>
+              <option value="Poesía" ${defaultGenre === 'Poesía' ? 'selected' : ''}>Poesía</option>
+            </select>
           </div>
           <div>
             <label class="font-ui text-label-sm uppercase tracking-wider text-on-surface-variant block mb-1">Año</label>
@@ -472,6 +475,60 @@ export function bootAdmin(init: AdminInit): void {
     handleUrlSubmit(url).then(() => { if (urlInput) urlInput.value = ''; setTimeout(() => { if (urlStatus) urlStatus.textContent = ''; }, 8000); });
   });
   urlInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') btnUrlImport?.click(); });
+
+  /* ── Evento de sincronización con Drive ───── */
+  const btnSyncDrive = document.getElementById('btn-sync-drive');
+  const syncStatus = document.getElementById('sync-drive-status');
+
+  btnSyncDrive?.addEventListener('click', async () => {
+    if (isProcessing) return;
+    isProcessing = true;
+    if (syncStatus) {
+      syncStatus.textContent = '⏳ Buscando documentos nuevos en Drive...';
+      syncStatus.className = 'font-ui text-body-sm text-primary';
+    }
+
+    try {
+      const res = await fetch('/api/drive-folder');
+      if (!res.ok) throw new Error('Error al conectar con Drive');
+      const data = await res.json();
+      
+      const existingSlugs = new Set(books.map(b => b.slug));
+      const missingFiles = data.files.filter((f: any) => {
+        const tempSlug = sanitizeSlug(f.name.replace(/\.(docx|pdf|epub)$/i, ''));
+        return !existingSlugs.has(tempSlug);
+      });
+
+      if (missingFiles.length === 0) {
+        if (syncStatus) {
+          syncStatus.textContent = '✅ Todos los libros de la carpeta de Drive ya están en tu biblioteca.';
+          syncStatus.className = 'font-ui text-body-sm text-primary';
+        }
+      } else {
+        if (syncStatus) {
+          syncStatus.className = 'mt-4 flex flex-col gap-2';
+          syncStatus.innerHTML = `<span class="text-on-surface">Se encontraron ${missingFiles.length} documentos nuevos. Hacé clic para importarlos:</span>`;
+          missingFiles.forEach((f: any) => {
+            const btn = document.createElement('button');
+            btn.className = 'text-left px-3 py-2 bg-surface-container-high rounded-md hover:bg-primary-container hover:text-on-primary-container transition-colors';
+            btn.textContent = `📥 Importar: ${f.name}`;
+            btn.onclick = () => {
+              isProcessing = false; // Permitir que handleUrlSubmit funcione
+              handleUrlSubmit(f.url);
+            };
+            syncStatus.appendChild(btn);
+          });
+        }
+      }
+    } catch (err: any) {
+      if (syncStatus) {
+        syncStatus.textContent = `❌ ${err.message}`;
+        syncStatus.className = 'font-ui text-body-sm text-error';
+      }
+    } finally {
+      isProcessing = false;
+    }
+  });
 
   /* ── Inicializar ─────────────────────────────────── */
   books = loadBooks();

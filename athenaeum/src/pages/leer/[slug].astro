@@ -22,6 +22,7 @@ const config: ReaderConfig = {
   bookTitle: book.data.title,
   bookSubtitle: book.data.subtitle,
   author: book.data.author,
+  genre: book.data.genre,
   coverPalette: book.data.coverPalette,
   chapters: book.chapters.map((ch) => ({
     number: ch.data.number,
@@ -43,7 +44,7 @@ const configJson = JSON.stringify(config).replace(/</g, '\\u003c');
   activePath="reader"
   hideNav={true}
 >
-  <div id="reader-wrapper" class="flex flex-col w-full relative select-none max-w-5xl mx-auto w-full h-[100dvh] transition-all duration-500 overflow-hidden pt-space-xs pb-space-xs">
+  <div id="reader-wrapper" data-genre={book.data.genre} class="flex flex-col w-full relative select-none max-w-5xl mx-auto w-full h-[100dvh] transition-all duration-500 overflow-hidden pt-space-xs pb-space-xs">
     <!-- Configuración del lector (renderizada en build, validada en cliente) -->
     <script id="reader-config" type="application/json" set:html={configJson} />
 
@@ -670,6 +671,15 @@ const configJson = JSON.stringify(config).replace(/</g, '\\u003c');
       padding-right: 0.12em;
       color: var(--color-primary);
       font-weight: 600;
+    }
+
+    #reader-wrapper[data-genre="Poesía"] .reader-body :global(p) {
+      text-align: center;
+      font-style: italic;
+      line-height: 1.8;
+      max-width: 85%;
+      margin-left: auto;
+      margin-right: auto;
     }
   </style>
 </BaseLayout>

@@ -16,13 +16,9 @@ export interface BookWithChapters {
   readingMinutes: number;
 }
 
-/**
- * Devuelve todos los libros publicados con sus capítulos ordenados.
- * Los borradores quedan fuera del build público.
- */
-export async function getPublishedBooks(): Promise<BookWithChapters[]> {
+export async function getAllBooks(): Promise<BookWithChapters[]> {
   const [books, chapters] = await Promise.all([
-    getCollection('books', ({ data }) => data.status === 'published'),
+    getCollection('books'),
     getCollection('chapters'),
   ]);
 
@@ -52,6 +48,16 @@ export async function getPublishedBooks(): Promise<BookWithChapters[]> {
     })
     .sort((a, b) => a.data.order - b.data.order);
 }
+
+/**
+ * Devuelve todos los libros publicados con sus capítulos ordenados.
+ * Los borradores quedan fuera del build público.
+ */
+export async function getPublishedBooks(): Promise<BookWithChapters[]> {
+  const allBooks = await getAllBooks();
+  return allBooks.filter(b => b.data.status === 'published');
+}
+
 
 /** Busca un libro publicado por slug de URL (validado contra la colección). */
 export async function getBookBySlug(slug: string): Promise<BookWithChapters | undefined> {

@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import EPub from 'epub2';
 import TurndownService from 'turndown';
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);

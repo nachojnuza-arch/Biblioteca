@@ -14,6 +14,7 @@ export interface ReaderConfig {
   bookTitle: string;
   bookSubtitle: string;
   author: string;
+  genre?: string;
   /** Fondo del lector */
   coverPalette: string;
   chapters: ChapterDoc[];

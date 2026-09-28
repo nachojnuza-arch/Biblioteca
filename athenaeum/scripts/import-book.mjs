@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import mammoth from 'mammoth';
 import TurndownService from 'turndown';
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -55,6 +55,10 @@ async function importBook(docxPath) {
       else if (key === 'sinopsis' || key === 'synopsis') metadata.synopsis = val;
       else if (key === 'tags' || key === 'etiquetas') metadata.tags = val.split(',').map(t => t.trim());
     }
+  }
+
+  if (metadata.title === 'Libro Sin Título') {
+    metadata.title = path.basename(docxPath, '.docx');
   }
 
   const slug = metadata.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');

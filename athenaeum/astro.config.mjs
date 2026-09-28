@@ -58,6 +58,38 @@ const proxyPlugin = {
         }
       });
     });
+    server.middlewares.use('/api/drive-folder', async (req, res) => {
+      try {
+        const folderUrl = 'https://drive.google.com/drive/folders/13ThrxuREivJjLwMOiRQMdRk6tvndeRpa?usp=sharing';
+        const driveRes = await fetch(folderUrl);
+        const html = await driveRes.text();
+
+        const files = [];
+        const regex = /\["([a-zA-Z0-9_-]{33})",\["([^"]+?\.(?:docx|epub))"/g;
+        
+        let match;
+        const seen = new Set();
+        while ((match = regex.exec(html)) !== null) {
+          const id = match[1];
+          const name = match[2];
+          if (!seen.has(id)) {
+            seen.add(id);
+            files.push({
+              id,
+              name,
+              url: `https://drive.google.com/uc?export=download&id=${id}&ext=.docx`
+            });
+          }
+        }
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ files }));
+      } catch (err) {
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
     server.middlewares.use('/api/proxy', (req, res) => {
       const url = new URL(req.url || '', `http://${req.headers.host}`);
       const target = url.searchParams.get('url');
