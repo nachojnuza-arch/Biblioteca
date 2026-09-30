@@ -7,9 +7,10 @@ interface Props {
   compact?: boolean;
   class?: string;
   coverImage?: string;
+  coverFallbackImage?: string;
 }
 
-const { title, subtitle = '', author, palette = 'terracotta', compact = false, class: className, coverImage } = Astro.props;
+const { title, subtitle = '', author, palette = 'terracotta', compact = false, class: className, coverImage, coverFallbackImage } = Astro.props;
 
 const palettes = {
   terracotta: { bg: '#9E4734', frame: '#FFDAD3', text: '#FFF8F5', accent: '#FFDAD3' },
@@ -69,6 +70,7 @@ const p = palettes[palette];
     {coverImage && (
       <img
         data-cover-src={coverImage}
+        data-cover-fallback-src={coverFallbackImage}
         alt={`Portada de ${title}`}
         crossorigin="anonymous"
         class="ngrok-cover absolute inset-0 w-full h-full object-cover z-20 transition-opacity duration-300 opacity-0"
@@ -139,22 +141,28 @@ const p = palettes[palette];
     const covers = document.querySelectorAll('img.ngrok-cover');
     covers.forEach((img) => {
       const src = img.getAttribute('data-cover-src');
+      const fallbackSrc = img.getAttribute('data-cover-fallback-src');
       if (!src) return;
 
-      fetch(src, {
-        headers: {
-          'ngrok-skip-browser-warning': 'true'
-        }
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error('Cover not found');
-          return res.blob();
+      const fetchImage = (url) => {
+        return fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } })
+          .then(res => {
+            if (!res.ok) throw new Error('Not found');
+            return res.blob();
+          });
+      };
+
+      fetchImage(src)
+        .catch(() => {
+           if (fallbackSrc) {
+              return fetchImage(fallbackSrc);
+           }
+           throw new Error('No fallback');
         })
         .then((blob) => {
           const url = URL.createObjectURL(blob);
           
           img.onload = () => {
-            // Extraer color dominante y aplicarlo a las partes 3D
             const domColor = getAverageColor(img);
             if (domColor) {
               const wrapper = img.closest('.book-3d-wrapper');
@@ -163,7 +171,6 @@ const p = palettes[palette];
                 wrapper.style.setProperty('--book-color', domColor);
               }
             }
-            // Mostrar imagen
             // @ts-ignore
             img.style.opacity = '1';
           };

@@ -33,6 +33,7 @@ const lastRevision = new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: '
           author={book.data.author}
           palette={book.data.coverPalette}
           coverImage={`https://smudgy-relic-criteria.ngrok-free.dev/portadas/${book.slug}.jpg`}
+          coverFallbackImage={`https://smudgy-relic-criteria.ngrok-free.dev/portadas/${book.data.title.toLowerCase().replace(/\s+/g, '-')}.jpg`}
         />
       </div>
 
