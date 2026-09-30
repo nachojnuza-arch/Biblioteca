@@ -28,6 +28,8 @@ const bookSchema = z.object({
   status: z.enum(['published', 'draft']).default('published'),
   /** Variantes de color de portada tipográfica */
   coverPalette: z.enum(['terracotta', 'olive', 'burgundy', 'ivory']).default('terracotta'),
+  /** Imagen de portada opcional (por URL o CDN) */
+  coverImage: z.string().url().optional(),
   /** Frase del prólogo (se muestra en la ficha editorial) */
   prologueQuote: z.string().default(''),
   prologueAttribution: z.string().default(''),

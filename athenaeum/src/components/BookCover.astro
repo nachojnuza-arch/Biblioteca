@@ -12,9 +12,10 @@ interface Props {
   /** Tamaño relativo del texto del título */
   compact?: boolean;
   class?: string;
+  coverImage?: string;
 }
 
-const { title, subtitle = '', author, palette = 'terracotta', compact = false, class: className } = Astro.props;
+const { title, subtitle = '', author, palette = 'terracotta', compact = false, class: className, coverImage } = Astro.props;
 
 const palettes = {
   terracotta: { bg: '#9E4734', frame: '#FFDAD3', text: '#FFF8F5', accent: '#FFDAD3' },
@@ -32,6 +33,14 @@ const p = palettes[palette];
   role="img"
   aria-label={`Portada de ${title}, de ${author}`}
 >
+  {coverImage && (
+    <img
+      src={coverImage}
+      alt={`Portada de ${title}`}
+      class="absolute inset-0 w-full h-full object-cover z-20 transition-opacity duration-300"
+      onerror="this.style.opacity='0'; setTimeout(() => this.remove(), 300);"
+    />
+  )}
   <!-- Grano y doble filo editorial -->
   <div class="absolute inset-0 paper-grain pointer-events-none" style="opacity: 0.08;"></div>
   <div

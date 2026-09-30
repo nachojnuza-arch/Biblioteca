@@ -20,6 +20,7 @@ const { book } = Astro.props;
       subtitle={book.data.subtitle}
       author={book.data.author}
       palette={book.data.coverPalette}
+      coverImage={`https://smudgy-relic-criteria.ngrok-free.dev/api/public/dl/OCuolSla/${book.slug}.jpg`}
       class="transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-[2px_8px_20px_rgba(43,39,36,0.12)]"
     />
   </a>
