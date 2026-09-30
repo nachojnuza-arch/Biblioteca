@@ -21,7 +21,7 @@ const palettes = {
 const p = palettes[palette];
 ---
 
-<div class={`relative w-full aspect-[2/3] ${className ?? ''}`}>
+<div class={`relative w-full aspect-[2/3] book-3d-wrapper ${className ?? ''}`} style={`--book-color: ${p.bg};`}>
   
   <!-- Bloque lateral de páginas (derecha) con tapa trasera sutil -->
   <div 
@@ -29,7 +29,7 @@ const p = palettes[palette];
     style={`
       background-image: repeating-linear-gradient(to right, transparent, transparent 1px, rgba(216,203,176,0.6) 1px, rgba(216,203,176,0.6) 2px); 
       box-shadow: inset -3px 0 10px rgba(0,0,0,0.05);
-      border-right: 1px solid color-mix(in srgb, ${p.bg} 40%, #000);
+      border-right: 1px solid color-mix(in srgb, var(--book-color) 40%, #000);
     `}
   ></div>
 
@@ -39,17 +39,17 @@ const p = palettes[palette];
     style={`
       background-image: repeating-linear-gradient(to bottom, transparent, transparent 1px, rgba(216,203,176,0.6) 1px, rgba(216,203,176,0.6) 2px); 
       box-shadow: inset 0 -3px 10px rgba(0,0,0,0.08);
-      border-bottom: 1px solid color-mix(in srgb, ${p.bg} 40%, #000);
+      border-bottom: 1px solid color-mix(in srgb, var(--book-color) 40%, #000);
     `}
   ></div>
 
-  <!-- Pie del lomo (esquina inferior izquierda) -->
+  <!-- Pie del lomo (esquina inferior izquierda) más fino (10px) -->
   <div 
-    class="absolute -bottom-[12px] left-0 w-[14px] h-[12px] origin-top-left skew-x-[45deg] z-0"
+    class="absolute -bottom-[12px] left-0 w-[10px] h-[12px] origin-top-left skew-x-[45deg] z-0"
     style={`
-      background: linear-gradient(to right, color-mix(in srgb, ${p.bg} 70%, #000), color-mix(in srgb, ${p.bg} 90%, #000));
-      border-bottom: 1px solid color-mix(in srgb, ${p.bg} 40%, #000);
-      border-left: 1px solid color-mix(in srgb, ${p.bg} 50%, #000);
+      background: linear-gradient(to right, color-mix(in srgb, var(--book-color) 70%, #000), color-mix(in srgb, var(--book-color) 90%, #000));
+      border-bottom: 1px solid color-mix(in srgb, var(--book-color) 40%, #000);
+      border-left: 1px solid color-mix(in srgb, var(--book-color) 50%, #000);
     `}
   ></div>
 
@@ -57,11 +57,11 @@ const p = palettes[palette];
   <div 
     class="absolute inset-0 rounded-l-[3px] rounded-r-[1px] overflow-hidden flex flex-col items-center justify-between p-4 text-center z-10 bg-surface"
     style={`
-      background: linear-gradient(160deg, ${p.bg} 0%, color-mix(in srgb, ${p.bg} 85%, #000) 100%); 
+      background: linear-gradient(160deg, var(--book-color) 0%, color-mix(in srgb, var(--book-color) 85%, #000) 100%); 
       color: ${p.text}; 
       box-shadow: inset 4px 0 8px -2px rgba(0,0,0,0.4);
-      border-right: 1.5px solid color-mix(in srgb, ${p.bg} 70%, #fff);
-      border-bottom: 1.5px solid color-mix(in srgb, ${p.bg} 50%, #000);
+      border-right: 1.5px solid color-mix(in srgb, var(--book-color) 70%, #fff);
+      border-bottom: 1.5px solid color-mix(in srgb, var(--book-color) 50%, #000);
     `}
     role="img"
     aria-label={`Portada de ${title}, de ${author}`}
@@ -70,6 +70,7 @@ const p = palettes[palette];
       <img
         data-cover-src={coverImage}
         alt={`Portada de ${title}`}
+        crossorigin="anonymous"
         class="ngrok-cover absolute inset-0 w-full h-full object-cover z-20 transition-opacity duration-300 opacity-0"
       />
     )}
@@ -85,7 +86,7 @@ const p = palettes[palette];
     </div>
 
     <!-- Borde interior para simular el cartón de la tapa -->
-    <div class="absolute inset-0 border-[2px] pointer-events-none z-30 opacity-40 mix-blend-overlay" style={`border-color: ${p.bg};`}></div>
+    <div class="absolute inset-0 border-[2px] pointer-events-none z-30 opacity-40 mix-blend-overlay" style={`border-color: var(--book-color);`}></div>
 
     <!-- Contenido CSS cuando no hay imagen -->
     <div class="relative z-1 pt-2 flex flex-col items-center gap-1">
@@ -118,6 +119,22 @@ const p = palettes[palette];
 </div>
 
 <script>
+  function getAverageColor(imgElement) {
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+      canvas.width = 1;
+      canvas.height = 1;
+      ctx.drawImage(imgElement, 0, 0, 1, 1);
+      const data = ctx.getImageData(0, 0, 1, 1).data;
+      if (data[3] === 0) return null; // Transparente
+      return `rgb(${data[0]}, ${data[1]}, ${data[2]})`;
+    } catch (e) {
+      return null;
+    }
+  }
+
   function loadCovers() {
     const covers = document.querySelectorAll('img.ngrok-cover');
     covers.forEach((img) => {
@@ -134,9 +151,25 @@ const p = palettes[palette];
           return res.blob();
         })
         .then((blob) => {
-          img.src = URL.createObjectURL(blob);
+          const url = URL.createObjectURL(blob);
+          
+          img.onload = () => {
+            // Extraer color dominante y aplicarlo a las partes 3D
+            const domColor = getAverageColor(img);
+            if (domColor) {
+              const wrapper = img.closest('.book-3d-wrapper');
+              if (wrapper) {
+                // @ts-ignore
+                wrapper.style.setProperty('--book-color', domColor);
+              }
+            }
+            // Mostrar imagen
+            // @ts-ignore
+            img.style.opacity = '1';
+          };
+          
           // @ts-ignore
-          img.style.opacity = '1';
+          img.src = url;
         })
         .catch(() => {
           img.remove();
