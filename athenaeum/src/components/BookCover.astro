@@ -91,7 +91,7 @@ const p = palettes[palette];
 
 <script>
   // Este script se ejecuta en el cliente (navegador) para saltarse la página de advertencia de Ngrok
-  document.addEventListener('DOMContentLoaded', () => {
+  function loadCovers() {
     const covers = document.querySelectorAll('img.ngrok-cover');
     covers.forEach((img) => {
       const src = img.getAttribute('data-cover-src');
@@ -112,9 +112,13 @@ const p = palettes[palette];
           img.style.opacity = '1';
         })
         .catch(() => {
-          // Si falla (ej. servidor apagado o imagen no existe), eliminamos el img para revelar la portada CSS
           img.remove();
         });
     });
-  });
+  }
+
+  // Ejecutar inmediatamente (Astro defiere los módulos automáticamente)
+  loadCovers();
+  // También escuchar transiciones si Astro ViewTransitions estuviera habilitado en el futuro
+  document.addEventListener('astro:page-load', loadCovers);
 </script>
