@@ -12,7 +12,7 @@ const { book } = Astro.props;
 <article class="flex flex-col gap-2" data-book-slug={book.slug}>
   <a
     href={`/libro/${book.slug}`}
-    class="group block rounded-lg focus-within:ring-2 focus-within:ring-primary"
+    class="group block rounded-lg focus-within:ring-2 focus-within:ring-primary pr-[14px] pb-[14px]"
     aria-label={`Ver ficha de ${book.data.title}, de ${book.data.author}`}
   >
     <BookCover
