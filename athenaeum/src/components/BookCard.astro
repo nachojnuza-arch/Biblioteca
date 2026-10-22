@@ -7,7 +7,8 @@ interface Props {
 }
 
 const { book } = Astro.props;
-const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
+const rawBackend = (import.meta.env.VITE_BACKEND_URL || '').trim();
+const backendUrl = rawBackend.includes('ngrok') ? '' : rawBackend;
 ---
 
 <article class="flex flex-col gap-2" data-book-slug={book.slug}>

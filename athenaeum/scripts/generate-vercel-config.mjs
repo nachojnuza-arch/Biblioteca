@@ -4,7 +4,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 dotenv.config({ path: '.env.local' });
 
-const backendUrl = (process.env.VITE_BACKEND_URL || '').trim();
+const rawBackend = (process.env.VITE_BACKEND_URL || '').trim();
+const backendUrl = rawBackend.includes('ngrok') ? '' : rawBackend;
 const extraImgSrc = backendUrl ? ` ${backendUrl}` : '';
 const extraConnectSrc = backendUrl ? ` ${backendUrl}` : '';
 
