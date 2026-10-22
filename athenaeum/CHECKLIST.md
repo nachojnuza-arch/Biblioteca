@@ -15,15 +15,16 @@
 - [x] Eliminada la importación directa desde `@fontsource-variable/plus-jakarta-sans` en el layout que causaba que Astro la incrustara en base64.
 - [x] Agregada etiqueta `<link rel="preload">` en el `<head>` para cargar la fuente óptimamente.
 
-## C) Ngrok / backend (MUY IMPORTANTE)
-- [x] Eliminadas **todas** las URLs hardcodeadas `https://smudgy-relic-criteria.ngrok-free.dev` de los componentes (`BookCard.astro` y `[slug].astro`).
-- [x] Reemplazadas por la variable `import.meta.env.VITE_BACKEND_URL`.
-- [x] Creado archivo `.env` con la URL temporal actual.
-- [x] Creado archivo `.env.example` con la URL placeholder.
-- [x] Agregados `.env`, `.env.local` y variaciones a `.gitignore`.
+## C) Nextcloud / Portadas estáticas (Sin dependencia de Ngrok)
+- [x] Eliminada la dependencia obligatoria de ngrok y URLs remotas.
+- [x] Creado script `scripts/sync-nextcloud-covers.mjs` que copia automáticamente las portadas de `~/Nextcloud/Athenaeum/portadas/` a `public/portadas/`.
+- [x] Agregado comando `npm run sync:covers` e integrado en `npm run build`.
+- [x] `BookCard.astro` y `[slug].astro` ahora soportan rutas relativas locales si `VITE_BACKEND_URL` está vacío.
+- [x] `BookCover.astro` ya no inyecta cabeceras de ngrok (`ngrok-skip-browser-warning`).
+- [x] En `.env` la variable `VITE_BACKEND_URL` ahora queda vacía por defecto para servir portadas locales/estáticas desde `/portadas/`.
 
-⚠️ **ATENCIÓN AL USUARIO:**
-El dominio `smudgy-relic-criteria.ngrok-free.dev` sigue definido en `.env` porque es el que la aplicación necesita para funcionar hoy, pero es **TEMPORAL**. Cuando lleves el backend a producción, simplemente cambia el valor de `VITE_BACKEND_URL` en Vercel (o en tu `.env`) y recompila la aplicación.
+ℹ️ **SINCRONIZACIÓN DE PORTADAS:**
+Cada vez que agregues o modifiques portadas en tu carpeta de Nextcloud (`~/Nextcloud/Athenaeum/portadas/`), puedes ejecutar `npm run sync:covers` (o directamente `npm run build`) para sincronizarlas al proyecto.
 
 ## D) HTTPS / contenido mixto
 - [x] El frontend (Vercel) siempre fuerza HTTPS por defecto.

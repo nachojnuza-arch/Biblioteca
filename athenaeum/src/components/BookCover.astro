@@ -73,7 +73,7 @@ const p = palettes[palette];
         data-cover-fallback-src={coverFallbackImage}
         alt={`Portada de ${title}`}
         crossorigin="anonymous"
-        class="ngrok-cover absolute inset-0 w-full h-full object-cover z-20 transition-opacity duration-300 opacity-0"
+        class="book-cover-img absolute inset-0 w-full h-full object-cover z-20 transition-opacity duration-300 opacity-0"
       />
     )}
     
@@ -138,14 +138,14 @@ const p = palettes[palette];
   }
 
   function loadCovers() {
-    const covers = document.querySelectorAll('img.ngrok-cover');
+    const covers = document.querySelectorAll('img.book-cover-img');
     covers.forEach((img) => {
       const src = img.getAttribute('data-cover-src');
       const fallbackSrc = img.getAttribute('data-cover-fallback-src');
       if (!src) return;
 
       const fetchImage = (url) => {
-        return fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } })
+        return fetch(url)
           .then(res => {
             if (!res.ok) throw new Error('Not found');
             return res.blob();

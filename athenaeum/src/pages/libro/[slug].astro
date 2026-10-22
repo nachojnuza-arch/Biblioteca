@@ -12,6 +12,7 @@ export async function getStaticPaths() {
 }
 
 const { book } = Astro.props;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
 
 const readingTime = `${Math.floor(book.readingMinutes / 60)}h ${book.readingMinutes % 60}m`;
 const lastRevision = new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short' }).format(
@@ -32,8 +33,8 @@ const lastRevision = new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: '
           subtitle={book.data.subtitle}
           author={book.data.author}
           palette={book.data.coverPalette}
-          coverImage={`${import.meta.env.VITE_BACKEND_URL}/portadas/${book.slug}.jpg`}
-          coverFallbackImage={`${import.meta.env.VITE_BACKEND_URL}/portadas/${book.data.title.toLowerCase().replace(/\s+/g, '-')}.jpg`}
+          coverImage={`${backendUrl}/portadas/${book.slug}.jpg`}
+          coverFallbackImage={`${backendUrl}/portadas/${book.data.title.toLowerCase().replace(/\s+/g, '-')}.jpg`}
         />
       </div>
 

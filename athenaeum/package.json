@@ -6,7 +6,8 @@
   "description": "Biblioteca digital personal Athenaeum: publicación de libros propios con lector flipbook 3D",
   "scripts": {
     "dev": "astro dev",
-    "build": "node scripts/generate-vercel-config.mjs && astro build",
+    "sync:covers": "node scripts/sync-nextcloud-covers.mjs",
+    "build": "node scripts/sync-nextcloud-covers.mjs && node scripts/generate-vercel-config.mjs && astro build",
     "preview": "astro preview",
     "check": "astro check",
     "astro": "astro",
